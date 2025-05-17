@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "373109289686",
+    "project_id": "echo-read-d5e6c",
+    "storage_bucket": "echo-read-d5e6c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373109289686:android:54bef811a91598c6378f77",
+        "android_client_info": {
+          "package_name": "com.mubtgi.echoread"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRZdidMzZBfufkUAsgiuHUN1SPENPUzlk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
