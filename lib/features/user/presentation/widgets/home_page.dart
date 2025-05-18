@@ -4,7 +4,7 @@ import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/features/auth/services/auth_service.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
   State<Home> createState() => _HomeState();
@@ -16,7 +16,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService _authService = AuthService();
+    final AuthService authService = AuthService();
 
     return FutureBuilder<Map<String, dynamic>?>(
       future: getUserDetail(),
@@ -47,7 +47,7 @@ class _HomeState extends State<Home> {
               ElevatedButton.icon(
                 icon: const Icon(Icons.logout),
                 label: const Text('Logout'),
-                onPressed: () => _authService.logout(context),
+                onPressed: () => authService.logout(context),
               ),
             ],
           ),

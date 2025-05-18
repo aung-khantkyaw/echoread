@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 import '../widgets/profile_page.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({Key? key}) : super(key: key);
-  static const String routeName = '/Profile';
+  const ProfilePage({super.key});
+  static const String routeName = '/profile';
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +15,7 @@ class ProfilePage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Profile(),
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );
   }
 }

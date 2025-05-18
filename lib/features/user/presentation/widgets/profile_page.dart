@@ -4,7 +4,7 @@ import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/features/auth/services/auth_service.dart';
 
 class Profile extends StatefulWidget {
-  const Profile({Key? key}) : super(key: key);
+  const Profile({super.key});
 
   @override
   State<Profile> createState() => _ProfileState();
@@ -16,7 +16,7 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService _authService = AuthService();
+    final AuthService authService = AuthService();
 
     return FutureBuilder<Map<String, dynamic>?>(
       future: getUserDetail(),
@@ -37,7 +37,7 @@ class _ProfileState extends State<Profile> {
               ElevatedButton.icon(
                 icon: const Icon(Icons.logout),
                 label: const Text('Logout'),
-                onPressed: () => _authService.logout(context),
+                onPressed: () => authService.logout(context),
               ),
             ],
           ),

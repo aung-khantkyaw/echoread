@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../widgets/registration_form.dart';
 
 class RegistrationPage extends StatelessWidget {
-  const RegistrationPage({Key? key}) : super(key: key);
+  const RegistrationPage({super.key});
   static const String routeName = '/registration';
 
   @override

@@ -4,7 +4,7 @@ import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/features/auth/services/auth_service.dart';
 
 class Admin extends StatefulWidget {
-  const Admin({Key? key}) : super(key: key);
+  const Admin({super.key});
 
   @override
   State<Admin> createState() => _AdminState();
@@ -16,7 +16,7 @@ class _AdminState extends State<Admin> {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService _authService = AuthService();
+    final AuthService authService = AuthService();
 
     return FutureBuilder<Map<String, dynamic>?>(
       future: getUserDetail(),
@@ -47,7 +47,7 @@ class _AdminState extends State<Admin> {
               ElevatedButton.icon(
                 icon: const Icon(Icons.logout),
                 label: const Text('Logout'),
-                onPressed: () => _authService.logout(context),
+                onPressed: () => authService.logout(context),
               ),
             ],
           ),

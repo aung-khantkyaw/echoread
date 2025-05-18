@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 import '../widgets/home_page.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
   static const String routeName = '/home';
 
   @override
@@ -14,6 +15,7 @@ class HomePage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Home(),
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 }

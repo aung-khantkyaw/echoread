@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -68,7 +70,7 @@ class AuthService {
       return null;
     }
     catch (e) {
-      print('Unexpected error: $e');
+      log('Unexpected error: $e');
       rethrow;
     }
   }
@@ -90,6 +92,6 @@ class AuthService {
     await prefs.setString('userName', name);
     await prefs.setString('userEmail', email);
     await prefs.setString('userRole', role);
-    await prefs.setString('userProfileImg', profileImg ?? '' );
+    await prefs.setString('userProfileImg', profileImg);
   }
 }
