@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
     } else if (role == 'user') {
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
-      Navigator.of(context).pushReplacementNamed('/login');
+      Navigator.of(context).pushReplacementNamed('/unauthorized');
     }
   }
 
