@@ -55,10 +55,13 @@ class _BottomNavBarState extends State<BottomNavBar> {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: widget.currentIndex,
+      selectedItemColor: Colors.blueAccent,
+      selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+      unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
       onTap: (index) => _onItemTapped(context, index),
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(Icons.home_sharp),
           label: 'Home',
         ),
         BottomNavigationBarItem(
