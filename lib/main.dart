@@ -41,6 +41,21 @@ class _SplashScreenState extends State<SplashScreen> {
     _isLoggedInFuture = checkIsLoggedIn();
   }
 
+  Future<void> _navigateBasedOnRole() async {
+    final user = await getUserDetail();
+    if (!mounted) return;
+
+    final role = user?['role'] ?? '';
+
+    if (role == 'admin') {
+      Navigator.of(context).pushReplacementNamed('/admin');
+    } else if (role == 'user') {
+      Navigator.of(context).pushReplacementNamed('/home');
+    } else {
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
@@ -50,28 +65,19 @@ class _SplashScreenState extends State<SplashScreen> {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
-        } else {
-          if (snapshot.hasData && snapshot.data == true) {
-            WidgetsBinding.instance.addPostFrameCallback((_) async {
-              final user = await getUserDetail(); // must return Map<String, dynamic>
-              final role = user?['role'] ?? '';
-
-              if (role == 'admin') {
-                Navigator.of(context).pushReplacementNamed('/admin');
-              } else if (role == 'user'){
-                Navigator.of(context).pushReplacementNamed('/home');
-              } else {
-                Navigator.of(context).pushReplacementNamed('/login');
-              }
-            });
-          } else {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context).pushReplacementNamed('/login');
-            });
-          }
-
-          return const SizedBox.shrink();
         }
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+
+          if (snapshot.hasData && snapshot.data == true) {
+            _navigateBasedOnRole();
+          } else {
+            Navigator.of(context).pushReplacementNamed('/login');
+          }
+        });
+
+        return const SizedBox.shrink();
       },
     );
   }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/validators.dart';
-import 'package:echoread/core/widgets/commonInputDecoration.dart';
+import 'package:echoread/core/widgets/common_input_decoration.dart';
 import '../../services/auth_service.dart';
 
 class RegistrationForm extends StatefulWidget {
-  const RegistrationForm({Key? key}) : super(key: key);
+  const RegistrationForm({super.key});
 
   @override
   State<RegistrationForm> createState() => _RegistrationFormState();
