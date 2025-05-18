@@ -1,48 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:echoread/core/utils/func.dart';
 
 import 'package:echoread/features/auth/services/auth_service.dart';
 
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class Profile extends StatelessWidget {
+  final Map<String, dynamic> userDetail;
 
-  @override
-  State<Profile> createState() => _ProfileState();
-}
-
-class _ProfileState extends State<Profile> {
-  Map<String, dynamic>? userDetail;
-  bool isLoading = true;
+  const Profile({super.key, required this.userDetail});
 
   @override
   Widget build(BuildContext context) {
     final AuthService authService = AuthService();
+    final profileImage = userDetail['profile_img']?.toString().isNotEmpty == true
+        ? userDetail['profile_img']
+        : 'assets/icon/app_icon.png';
 
-    return FutureBuilder<Map<String, dynamic>?>(
-      future: getUserDetail(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final user = snapshot.data!;
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Welcome User, ${user['name']}. This is your Profile', style: const TextStyle(fontSize: 18)),
-              const SizedBox(height: 20),
-
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.logout),
-                label: const Text('Logout'),
-                onPressed: () => authService.logout(context),
-              ),
-            ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Hello, ${userDetail['name']}!',
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           ),
-        );
-      },
+        ),
+        const SizedBox(height: 16),
+        CircleAvatar(
+          radius: 40,
+          backgroundImage: AssetImage(profileImage),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Email: ${userDetail['email']}',
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Role: ${userDetail['role']}',
+          style: const TextStyle(fontSize: 16),
+        ),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.logout),
+          label: const Text('Logout'),
+          onPressed: () => authService.logout(context),
+        ),
+      ],
     );
   }
 }

@@ -1,58 +1,50 @@
 import 'package:flutter/material.dart';
 
-import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/features/auth/services/auth_service.dart';
 
-class Admin extends StatefulWidget {
-  const Admin({super.key});
+class Admin extends StatelessWidget {
+  final Map<String, dynamic> userDetail;
 
-  @override
-  State<Admin> createState() => _AdminState();
-}
-
-class _AdminState extends State<Admin> {
-  Map<String, dynamic>? userDetail;
-  bool isLoading = true;
+  const Admin({super.key, required this.userDetail});
 
   @override
   Widget build(BuildContext context) {
     final AuthService authService = AuthService();
+    final profileImage = userDetail['profile_img']?.toString().isNotEmpty == true
+        ? userDetail['profile_img']
+        : 'assets/icon/app_icon.png';
 
-    return FutureBuilder<Map<String, dynamic>?>(
-      future: getUserDetail(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final user = snapshot.data!;
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Welcome Admin, ${user['name']}', style: const TextStyle(fontSize: 18)),
-              const SizedBox(height: 20),
-              InkWell(
-                onTap: () => Navigator.pushNamed(context, '/profile'),
-                child: const Text(
-                  'Go to Profile',
-                  style: TextStyle(
-                    color: Colors.blue,
-                    decoration: TextDecoration.underline,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.logout),
-                label: const Text('Logout'),
-                onPressed: () => authService.logout(context),
-              ),
-            ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Hello, ${userDetail['name']}!',
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           ),
-        );
-      },
+        ),
+        const SizedBox(height: 16),
+        CircleAvatar(
+          radius: 40,
+          backgroundImage: AssetImage(profileImage),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Email: ${userDetail['email']}',
+          style: const TextStyle(fontSize: 16),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Role: ${userDetail['role']}',
+          style: const TextStyle(fontSize: 16),
+        ),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.logout),
+          label: const Text('Logout'),
+          onPressed: () => authService.logout(context),
+        ),
+      ],
     );
   }
 }

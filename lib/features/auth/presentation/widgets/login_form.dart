@@ -43,12 +43,7 @@ class _LoginFormState extends State<LoginForm> {
       });
 
       if (result != null) {
-        final role = result['role'] as String;
-        if (role == 'admin') {
-          Navigator.pushReplacementNamed(context, '/admin');
-        } else {
           Navigator.pushReplacementNamed(context, '/home');
-        }
       } else {
         setState(() => _invalidCredential = true);
       }
