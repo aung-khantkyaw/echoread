@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../features/auth/presentation/screens/registration_screen.dart';
 import '../features/auth/presentation/screens/login_screen.dart';
+import '../features/auth/presentation/screens/forget_password_screen.dart';
 
 import '../features/user/presentation/screens/home_screen.dart';
 import '../features/user/presentation/screens/profile_screen.dart';
@@ -16,6 +17,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => RegistrationPage());
       case LoginPage.routeName:
         return MaterialPageRoute(builder: (_) => LoginPage());
+      case ForgetPasswordPage.routeName:
+        return MaterialPageRoute(builder: (_) => ForgetPasswordPage());
       case HomePage.routeName:
         return MaterialPageRoute(builder: (_) => HomePage());
       case ProfilePage.routeName:

@@ -75,6 +75,13 @@ class Validators {
     return null;
   }
 
+  static String? validateRegistrationErrorReturn(String? error){
+    if(error == 'email-already-in-use') {
+      return 'The email address is already use.';
+    }
+    return null;
+  }
+
   static String? validateNotEmpty(String? value, String fieldName) {
     if (value == null || value.trim().isEmpty) {
       return '$fieldName is required';

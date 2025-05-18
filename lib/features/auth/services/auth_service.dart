@@ -45,15 +45,12 @@ class AuthService {
 
       String uid = userCredential.user!.uid;
 
-      final DocumentSnapshot userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get();
+      final DocumentSnapshot userDoc = await _firestore.collection('users').doc(uid).get();
 
       if (userDoc.exists) {
         final data = userDoc.data() as Map<String, dynamic>;
 
-        await saveLoginInfo(uid, data['name'], data['email'], data['role'], data['profile_img']);
+        await saveLoginInfo(uid, data['name'], data['email'], data['role'], data['profile_img'] ?? '');
 
         return {
           'user_id': uid,
@@ -75,11 +72,41 @@ class AuthService {
     }
   }
 
+  Future<String?> forgetPassword(String email) async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        return 'No user found with this email.';
+      }
+
+      await _auth.sendPasswordResetEmail(email: email);
+      return 'Password reset email sent to $email';
+    } on FirebaseAuthException catch (e) {
+      log('FirebaseAuth error: ${e.code} - ${e.message}');
+      return 'Firebase error: ${e.message}';
+    } catch (e) {
+      log('Unexpected error: $e');
+      return 'An unexpected error occurred.';
+    }
+  }
+
 
   Future<void> logout(BuildContext context) async {
+    await _auth.signOut();
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
+    await prefs.remove('userId');
+    await prefs.remove('userName');
     await prefs.remove('userEmail');
+    await prefs.remove('userRole');
+    await prefs.remove('userProfileImg');
+
     if (context.mounted) {
       Navigator.pushReplacementNamed(context, '/login');
     }
