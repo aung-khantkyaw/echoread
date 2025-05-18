@@ -8,7 +8,7 @@ import '../features/user/presentation/screens/home_screen.dart';
 import '../features/user/presentation/screens/profile_screen.dart';
 
 import '../features/admin/presentation/screens/admin_screen.dart';
-
+import '../features/admin/presentation/screens/author_manage_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -25,6 +25,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => ProfilePage());
       case AdminPage.routeName:
         return MaterialPageRoute(builder: (_) => AdminPage());
+      case AuthorManagePage.routeName:
+        return MaterialPageRoute(builder: (_) => AuthorManagePage());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

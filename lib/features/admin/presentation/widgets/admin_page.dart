@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:echoread/core/widgets/icon_card.dart';
 import 'package:echoread/features/auth/services/auth_service.dart';
 
 class Admin extends StatelessWidget {
@@ -44,6 +45,21 @@ class Admin extends StatelessWidget {
           label: const Text('Logout'),
           onPressed: () => authService.logout(context),
         ),
+
+        Expanded(
+          child: GridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 16,
+            crossAxisSpacing: 16,
+            padding: const EdgeInsets.all(16),
+            children: [
+              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushReplacementNamed(context, '/author-manage');}),
+              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushReplacementNamed(context, '/authors');}),
+              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushReplacementNamed(context, '/authors');}),
+              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushReplacementNamed(context, '/authors');})
+            ],
+          )
+        )
       ],
     );
   }
