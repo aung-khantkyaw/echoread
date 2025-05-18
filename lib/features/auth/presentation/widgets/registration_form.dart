@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/validators.dart';
@@ -25,6 +27,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  String? error;
+
   Future<void> _registration() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
@@ -48,6 +52,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
         setState(() {
           _invalidCredential = true;
         });
+        error = Validators.validateRegistrationErrorReturn(errorCode);
       } else {
         if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/login');
@@ -135,7 +140,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
-                'Account create is not success.',
+                error ?? 'Account create is not success.',
                 style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
             ),

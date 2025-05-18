@@ -114,6 +114,21 @@ class _LoginFormState extends State<LoginForm> {
             obscureText: _obscurePassword,
             validator: Validators.validatePassword,
           ),
+          const SizedBox(height: 10),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/forget-password');
+              },
+              child: Text(
+                'Forget Password?',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 20),
           if (_invalidCredential)
             Padding(
