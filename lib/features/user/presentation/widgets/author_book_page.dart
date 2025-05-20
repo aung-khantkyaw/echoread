@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:echoread/features/user/presentation/screens/book_detail_screen.dart'; // Import the new screen
 
-class HomeContentPage extends StatelessWidget { // Renamed from Home to HomeContentPage
-  final List<Map<String, dynamic>> allBooks; // Receive all books from parent
+class AuthorBookPage extends StatelessWidget {
+  final List<Map<String, dynamic>> booksList; // Receive books list from parent
 
-  const HomeContentPage({super.key, required this.allBooks});
+  const AuthorBookPage({super.key, required this.booksList});
 
   // This method will now navigate to the book detail page
   void _navigateToBookDetail(BuildContext context, String bookId, String bookName) {
@@ -17,9 +17,9 @@ class HomeContentPage extends StatelessWidget { // Renamed from Home to HomeCont
 
   @override
   Widget build(BuildContext context) {
-    if (allBooks.isEmpty) {
+    if (booksList.isEmpty) {
       return const Center(
-        child: Text('No books available.'),
+        child: Text('No books available for this author.'),
       );
     }
 
@@ -30,9 +30,9 @@ class HomeContentPage extends StatelessWidget { // Renamed from Home to HomeCont
         mainAxisSpacing: 16.0,
         childAspectRatio: 0.7,
       ),
-      itemCount: allBooks.length,
+      itemCount: booksList.length,
       itemBuilder: (context, index) {
-        final book = allBooks[index];
+        final book = booksList[index];
         final bookId = book['id'] ?? '';
         final bookName = book['book_name'] ?? 'Unknown Book';
         final bookImg = book['book_img']?.toString().isNotEmpty == true
@@ -40,7 +40,7 @@ class HomeContentPage extends StatelessWidget { // Renamed from Home to HomeCont
             : 'assets/icon/app_icon.png';
 
         return GestureDetector(
-          onTap: () => _navigateToBookDetail(context, bookId, bookName), // Navigate to book detail
+          onTap: () => _navigateToBookDetail(context, bookId, bookName),
           child: Card(
             elevation: 2,
             shape: RoundedRectangleBorder(

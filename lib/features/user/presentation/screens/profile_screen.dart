@@ -59,7 +59,8 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.all(16.0),
         child: Profile(userDetail: userDetail!),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
+      // BottomNavBar currentIndex changed from 1 to 2
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2), // Highlight Profile tab (index 2)
     );
   }
 
