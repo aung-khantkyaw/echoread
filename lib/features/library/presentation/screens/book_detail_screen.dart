@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:echoread/core/utils/func.dart'; // Assuming getUserDetail is defined here
 import 'package:echoread/core/widgets/common_app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
-import 'package:echoread/features/user/services/book_service.dart'; // Assuming BookService is here
-import 'package:echoread/features/admin/services/author_manage_service.dart'; // Using your provided AuthorManageService
 
+import '../../services/book_service.dart'; // Assuming BookService is here
+import '../../services/author_service.dart';
 import '../widgets/book_detail_page.dart'; // Ensure this path is correct for your BookDetailPage widget
 
 class BookDetailScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class BookDetailScreen extends StatefulWidget {
 
 class _BookDetailScreenState extends State<BookDetailScreen> {
   final BookService _bookService = BookService();
-  final AuthorManageService _authorManageService = AuthorManageService();
+  final AuthorService _authorService = AuthorService();
 
   Map<String, dynamic>? userDetail;
   Map<String, dynamic>? _bookDetail; // To hold fetched book details
@@ -65,9 +65,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     if (book != null) {
       final String? authorId = book['author_id']; // This field name should match your book collection in Firestore
       if (authorId != null) {
-        // _authorManageService.getAuthorDetail correctly handles nullable String
-        // And its implementation in AuthorManageService will return map with 'name' key
-        _authorDetail = await _authorManageService.getAuthorDetail(authorId);
+        // _authorService.getAuthorDetail correctly handles nullable String
+        // And its implementation in AuthorService will return map with 'name' key
+        _authorDetail = await _authorService.getAuthorDetail(authorId);
       }
     }
 

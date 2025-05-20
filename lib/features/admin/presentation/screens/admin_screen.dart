@@ -58,7 +58,7 @@ class _AdminPageState extends State<AdminPage> {
         padding: const EdgeInsets.all(16.0),
         child: Admin(userDetail: userDetail!),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 

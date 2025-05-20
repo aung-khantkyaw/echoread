@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/core/widgets/common_app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
-import 'package:echoread/features/user/services/book_service.dart'; // Import BookService
+import 'package:echoread/features/library/services/book_service.dart'; // Import BookService
 
 import '../widgets/home_page.dart';
 

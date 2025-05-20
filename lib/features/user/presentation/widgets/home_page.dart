@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:echoread/features/user/presentation/screens/book_detail_screen.dart'; // Import the new screen
+import 'package:echoread/features/library/presentation/screens/book_detail_screen.dart'; // Import the new screens
 
 class HomeContentPage extends StatelessWidget { // Renamed from Home to HomeContentPage
   final List<Map<String, dynamic>> allBooks; // Receive all books from parent

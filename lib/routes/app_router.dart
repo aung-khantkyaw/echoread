@@ -7,9 +7,10 @@ import '../features/auth/presentation/screens/forget_password_screen.dart';
 
 import '../features/user/presentation/screens/home_screen.dart';
 import '../features/user/presentation/screens/profile_screen.dart';
-import '../features/user/presentation/screens/author_list_screen.dart';
-import '../features/user/presentation/screens/author_book_screen.dart';
-import '../features/user/presentation/screens/book_detail_screen.dart'; // Import the new screen
+
+import '../features/library/presentation/screens/author_list_screen.dart';
+import '../features/library/presentation/screens/author_book_screen.dart';
+import '../features/library/presentation/screens/book_detail_screen.dart'; // Import the new screens
 
 import '../features/admin/presentation/screens/admin_screen.dart';
 import '../features/admin/presentation/screens/author_manage_screen.dart';
