@@ -1,3 +1,4 @@
+import 'package:echoread/features/admin/presentation/screens/book_manage_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../features/auth/presentation/screens/registration_screen.dart';
@@ -30,6 +31,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => AdminPage());
       case AuthorManagePage.routeName:
         return MaterialPageRoute(builder: (_) => AuthorManagePage());
+      case BookManagePage.routeName:
+        return MaterialPageRoute(builder: (_) => BookManagePage());
       case AuthorListScreen.routeName:
         return MaterialPageRoute(builder: (_) => AuthorListScreen());
       case AuthorBookScreen.routeName:

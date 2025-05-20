@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/widgets/icon_card.dart';
-import 'package:echoread/features/auth/services/auth_service.dart';
+import 'package:echoread/core/widgets/profile_card.dart';
 
 class Admin extends StatelessWidget {
   final Map<String, dynamic> userDetail;
@@ -10,7 +10,6 @@ class Admin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthService authService = AuthService();
     final profileImage = userDetail['profile_img']?.toString().isNotEmpty == true
         ? userDetail['profile_img']
         : 'assets/icon/app_icon.png';
@@ -18,34 +17,16 @@ class Admin extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Hello, ${userDetail['name']}!',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+        ProfileCard(
+          name: userDetail['name'],
+          email: userDetail['email'],
+          profileImg: profileImage,
         ),
-        const SizedBox(height: 16),
-        CircleAvatar(
-          radius: 40,
-          backgroundImage: AssetImage(profileImage),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'Email: ${userDetail['email']}',
-          style: const TextStyle(fontSize: 16),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Role: ${userDetail['role']}',
-          style: const TextStyle(fontSize: 16),
-        ),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.logout),
-          label: const Text('Logout'),
-          onPressed: () => authService.logout(context),
-        ),
-
+        // ElevatedButton.icon(
+        //   icon: const Icon(Icons.logout),
+        //   label: const Text('Logout'),
+        //   onPressed: () => authService.logout(context),
+        // ),
         Expanded(
           child: GridView.count(
             crossAxisCount: 2,
@@ -53,10 +34,8 @@ class Admin extends StatelessWidget {
             crossAxisSpacing: 16,
             padding: const EdgeInsets.all(16),
             children: [
-              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushReplacementNamed(context, '/author-manage');}),
-              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushReplacementNamed(context, '/authors');}),
-              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushReplacementNamed(context, '/authors');}),
-              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushReplacementNamed(context, '/authors');})
+              IconCard(title: 'Author', icon: Icons.person_rounded, onTap: (){Navigator.pushNamed(context, '/author-manage');}),
+              IconCard(title: 'Book', icon: Icons.collections_bookmark_rounded, onTap: (){Navigator.pushNamed(context, '/book-manage');}),
             ],
           )
         )

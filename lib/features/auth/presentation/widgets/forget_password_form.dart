@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/validators.dart';
-import 'package:echoread/core/widgets/common_input_decoration.dart';
+import 'package:echoread/core/widgets/input_decoration.dart';
 
 import '../../services/auth_service.dart';
 
