@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:echoread/core/widgets/item_manage_card.dart';
 import '../../services/author_manage_service.dart';
 
 class AuthorManage extends StatefulWidget {
@@ -167,10 +166,30 @@ class _AuthorManageState extends State<AuthorManage> {
             itemCount: _authors.length,
             itemBuilder: (context, index) {
               final author = _authors[index];
-              return HorizontalCard(
-                title: author['name'] ?? 'Unknown Author',
-                onEdit: () => _startEdit(author['id']),
-                onDelete: () => _deleteAuthor(author['id']),
+              return GestureDetector(
+                onTap: () => _startEdit(author['id']),
+                child: Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            author['name'] ?? 'Unknown Author',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteAuthor(author['id'])
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               );
             },
           ),
