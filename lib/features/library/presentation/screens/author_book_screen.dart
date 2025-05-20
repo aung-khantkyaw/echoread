@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/core/widgets/common_app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
-import 'package:echoread/features/user/services/book_service.dart';
-import 'package:echoread/features/user/presentation/screens/book_detail_screen.dart'; // Import the new screen
+import 'package:echoread/features/library/services/book_service.dart';
+import 'package:echoread/features/library/presentation/screens/book_detail_screen.dart'; // Import the new screens
 
 import '../widgets/author_book_page.dart';
 
