@@ -4,7 +4,7 @@ import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/core/widgets/common_app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 import 'package:echoread/features/admin/services/author_manage_service.dart'; // Use the existing service
-import 'package:echoread/features/user/presentation/screens/author_book_screen.dart'; // For search result navigation
+import 'package:echoread/features/library/presentation/screens/author_book_screen.dart'; // For search result navigation
 
 import '../widgets/author_list_page.dart'; // Import the new page widget
 
@@ -105,7 +105,7 @@ class _AuthorListScreenState extends State<AuthorListScreen> {
         context: context,
         profileRoute: profileRoute,
         profileImagePath: profileImage,
-        //title: 'Authors', // Set title for Authors screen
+        //title: 'Authors', // Set title for Authors screens
       ),
       body: Column( // Use Column to stack search bar and content
         children: [

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:echoread/features/user/presentation/screens/author_book_screen.dart'; // Import the new screen
+import 'package:echoread/features/library/presentation/screens/author_book_screen.dart'; // Import the new screens
 
 class AuthorListPage extends StatelessWidget {
   final List<Map<String, dynamic>> authorsList; // Receive author list from parent
