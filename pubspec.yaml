@@ -45,6 +45,8 @@ dependencies:
   dropdown_search: ^6.0.2
   drop_down_list: ^2.0.0
   file_picker: ^10.1.9
+  cloudinary_flutter: ^1.0.0
+  cloudinary_url_gen: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -71,6 +73,7 @@ flutter:
 
   assets:
     - assets/icon/
+    - .env
 
   fonts:
     - family: Cinzel

@@ -1,9 +1,13 @@
 import 'dart:io';
+import 'package:echoread/core/widgets/build_image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 
 import 'package:echoread/core/widgets/build_file_picker.dart';
+import 'package:echoread/core/widgets/build_text_field.dart';
+
+import 'package:echoread/core/config/upload_image.dart';
 
 class BookAddForm extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;
@@ -24,6 +28,7 @@ class _BookAddFormState extends State<BookAddForm> {
 
   String? _selectedAuthorId;
   File? _pickedImage;
+  String? _pickedImageUrl;
   String? _ebookFilePath;
   String? _audioFilePath;
 
@@ -56,7 +61,18 @@ class _BookAddFormState extends State<BookAddForm> {
 
   Future<void> _pickImage() async {
     final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (picked != null) setState(() => _pickedImage = File(picked.path));
+    // if (picked != null) setState(() => _pickedImage = File(picked.path));
+    if (picked != null) {
+      final file = File(picked.path);
+      final url = await uploadImageToCloudinary(file);
+      if (url != null) {
+        setState(() {
+          _pickedImage = file;
+          _pickedImageUrl = url;
+        });
+        print('Image uploaded! URL: $url');
+      }
+    }
   }
 
   Future<void> _pickEbookFile() async {
@@ -84,7 +100,7 @@ class _BookAddFormState extends State<BookAddForm> {
         'ebook_url': _ebookFilePath,
         'audio_url': _audioFilePath,
         'author_id': _selectedAuthorId,
-        'book_img': _pickedImage?.path,
+        'book_img': _pickedImageUrl,
       };
       print('Book Data: $bookData');
       // Navigator.pop(context, bookData);
@@ -95,53 +111,17 @@ class _BookAddFormState extends State<BookAddForm> {
     }
   }
 
-  Widget _buildImagePicker() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ElevatedButton(
-          onPressed: _pickImage,
-          child: Text(_pickedImage == null ? 'Upload Book Image' : 'Change Image'),
-        ),
-        if (_pickedImage != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Image.file(_pickedImage!, height: 100),
-          ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-    required String? Function(String?) validator,
-    int maxLines = 1,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(labelText: label, border: const OutlineInputBorder()),
-        validator: validator,
-        maxLines: maxLines,
-      ),
-    );
-  }
-
   Widget _buildAuthorSearchField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildTextField(
+        buildTextField(
           label: 'Search Author',
           controller: _authorSearchController,
           validator: (_) => _selectedAuthorId == null ? 'Select an author' : null,
         ),
-        if (_authorSearchController.text.isNotEmpty)
-          _filteredAuthors.isNotEmpty
-              ? Container(
+        if (_authorSearchController.text.isNotEmpty && _filteredAuthors.isNotEmpty)
+          Container(
             constraints: const BoxConstraints(maxHeight: 150),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade400),
@@ -165,8 +145,7 @@ class _BookAddFormState extends State<BookAddForm> {
                 );
               },
             ),
-          )
-              : const Text('No authors found', style: TextStyle(color: Colors.red)),
+          ),
         const SizedBox(height: 16),
       ],
     );
@@ -182,24 +161,24 @@ class _BookAddFormState extends State<BookAddForm> {
           key: _formKey,
           child: Column(
             children: [
-              _buildImagePicker(),
-              _buildTextField(
+              buildImagePicker(filePath: _pickedImage, onPressed: _pickImage),
+              buildTextField(
                 label: 'Book Name',
                 controller: _nameController,
                 validator: (v) => v == null || v.isEmpty ? 'Enter book name' : null,
               ),
               _buildAuthorSearchField(),
-              BuildFilePicker(
+              buildFilePicker(
                 label: 'Ebook File',
                 filePath: _ebookFilePath,
                 onPressed: _pickEbookFile,
               ),
-              BuildFilePicker(
+              buildFilePicker(
                 label: 'Audio File',
                 filePath: _audioFilePath,
                 onPressed: _pickAudioFile,
               ),
-              _buildTextField(
+              buildTextField(
                 label: 'Book Description',
                 controller: _descController,
                 validator: (v) => v == null || v.isEmpty ? 'Enter description' : null,

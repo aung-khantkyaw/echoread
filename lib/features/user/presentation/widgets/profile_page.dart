@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:echoread/features/auth/services/auth_service.dart';
 
+import 'package:echoread/core/widgets/profile_card.dart';
+
 class Profile extends StatelessWidget {
   final Map<String, dynamic> userDetail;
 
@@ -17,27 +19,10 @@ class Profile extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Hello, ${userDetail['name']}!',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 16),
-        CircleAvatar(
-          radius: 40,
-          backgroundImage: AssetImage(profileImage),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          'Email: ${userDetail['email']}',
-          style: const TextStyle(fontSize: 16),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Role: ${userDetail['role']}',
-          style: const TextStyle(fontSize: 16),
+        ProfileCard(
+          name: userDetail['name'],
+          email: userDetail['email'],
+          profileImg: profileImage,
         ),
         ElevatedButton.icon(
           icon: const Icon(Icons.logout),

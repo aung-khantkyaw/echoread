@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
 
-// ignore: non_constant_identifier_names
+import '../config/cloudinary_config.dart';
+
 PreferredSizeWidget commonAppBar({
   required BuildContext context,
   required String profileRoute,
   required String profileImagePath,
-  String? title = 'EchoRead', // Set 'EchoRead' as the default title
+  String? title = 'EchoRead',
 }) {
   return AppBar(
     backgroundColor: Colors.white,
-    surfaceTintColor: Colors.transparent, // For consistent background color
-    elevation: 1, // Add a subtle shadow
-    title: Text( // Always display text title now
-      title!, // Use ! because we know it's not null (either provided or default)
+    surfaceTintColor: Colors.transparent,
+    elevation: 1,
+    title: Text(
+      title!,
       style: const TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
     ),
-    centerTitle: false, // Center the title by default
+    centerTitle: false,
     actions: [
       GestureDetector(
         onTap: () {
@@ -28,11 +29,10 @@ PreferredSizeWidget commonAppBar({
           padding: const EdgeInsets.only(right: 16.0),
           child: CircleAvatar(
             radius: 20,
-            backgroundImage: AssetImage(profileImagePath),
-            onBackgroundImageError: (exception, stackTrace) {
-              // Fallback to a default icon if profile image asset fails
-              print('Error loading profile image: $exception');
-            },
+            backgroundImage: NetworkImage(
+              CloudinaryConfig.baseUrl(profileImagePath),
+            ),
+            // no onBackgroundImageError here
           ),
         ),
       ),

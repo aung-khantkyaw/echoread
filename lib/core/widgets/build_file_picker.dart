@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget BuildFilePicker({
+Widget buildFilePicker({
   required String label,
   required String? filePath,
   required VoidCallback onPressed,

@@ -46,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
         : '/unauthorized';
     final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
         ? userDetail!['profile_img']
-        : 'assets/icon/app_icon.png';
+        : 'echo_read/yw4zuxnmunuc87yb9gxn';
 
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
