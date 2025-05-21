@@ -1,3 +1,4 @@
+import 'package:echoread/features/auth/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/widgets/icon_card.dart';
@@ -10,9 +11,10 @@ class Admin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AuthService _authService = AuthService();
     final profileImage = userDetail['profile_img']?.toString().isNotEmpty == true
         ? userDetail['profile_img']
-        : 'assets/icon/app_icon.png';
+        : 'echo_read/yw4zuxnmunuc87yb9gxn';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,11 +24,11 @@ class Admin extends StatelessWidget {
           email: userDetail['email'],
           profileImg: profileImage,
         ),
-        // ElevatedButton.icon(
-        //   icon: const Icon(Icons.logout),
-        //   label: const Text('Logout'),
-        //   onPressed: () => authService.logout(context),
-        // ),
+        ElevatedButton.icon(
+          icon: const Icon(Icons.logout),
+          label: const Text('Logout'),
+          onPressed: () => _authService.logout(context),
+        ),
         Expanded(
           child: GridView.count(
             crossAxisCount: 2,

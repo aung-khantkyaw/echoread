@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../config/cloudinary_config.dart';
+
 class ProfileCard extends StatelessWidget {
   final String name;
   final String email;
@@ -40,8 +42,14 @@ class ProfileCard extends StatelessWidget {
                         color: Colors.black,
                         width: 2.0,
                       ),
+                      // image: DecorationImage(
+                      //   image: AssetImage(profileImg),
+                      //   fit: BoxFit.cover,
+                      // ),
                       image: DecorationImage(
-                        image: AssetImage(profileImg),
+                        image: NetworkImage(
+                          CloudinaryConfig.baseUrl(profileImg),
+                        ),
                         fit: BoxFit.cover,
                       ),
                     ),

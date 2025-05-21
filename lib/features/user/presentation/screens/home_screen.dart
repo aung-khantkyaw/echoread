@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> {
         : '/unauthorized';
     final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
         ? userDetail!['profile_img']
-        : 'assets/icon/app_icon.png'; // Default image
+        : 'echo_read/yw4zuxnmunuc87yb9gxn'; // Default image
 
     return Scaffold(
       backgroundColor: Colors.lightBlue[50], // Consistent background color
