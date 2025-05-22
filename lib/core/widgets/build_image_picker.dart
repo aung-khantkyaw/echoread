@@ -7,7 +7,7 @@ Widget buildImagePicker({required File? filePath, required VoidCallback onPresse
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       InkWell(
-        onTap: onPressed, // Trigger image picker on tap
+        onTap: onPressed,
         borderRadius: BorderRadius.circular(8),
         child: Card(
           elevation: 4,

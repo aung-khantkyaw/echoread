@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../core/widgets/show_snack_bar.dart';
-
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -109,6 +107,9 @@ class AuthService {
   }
 
   Future<void> deleteAccount(BuildContext context) async {
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     try {
       final user = FirebaseAuth.instance.currentUser;
 
@@ -131,22 +132,19 @@ class AuthService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.clear();
 
-      if (context.mounted) {
-        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
-      }
+      navigator.pushNamedAndRemoveUntil('/login', (route) => false);
     } on FirebaseAuthException catch (e) {
-      log('FirebaseAuthException: ${e.code}');
-      showSnackBar(context, 'Error: ${e.message}', type: SnackBarType.error);
-    } catch (e) {
-      log('Unexpected error during account deletion: $e');
-      showSnackBar(
-        context,
-        'Failed to delete account. Please try again.',
-        type: SnackBarType.error,
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('Error: ${e.message}')),
       );
+      log('FirebaseAuthException: ${e.code}');
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('Failed to delete account. Please try again.')),
+      );
+      log('Unexpected error during account deletion: $e');
     }
   }
-
 
   Future<void> saveLoginInfo(String uid, String name, String email, String role, String profileImg) async {
     final prefs = await SharedPreferences.getInstance();

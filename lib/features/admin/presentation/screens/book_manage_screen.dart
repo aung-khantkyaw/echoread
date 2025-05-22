@@ -1,12 +1,13 @@
-import 'package:echoread/features/admin/services/author_manage_service.dart';
 import 'package:flutter/material.dart';
 
-import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/core/widgets/app_bar.dart';
+import 'package:echoread/core/widgets/custom_gif_loading.dart';
+import 'package:echoread/core/utils/func.dart';
+
+import 'package:echoread/features/admin/services/author_manage_service.dart';
+import 'package:echoread/features/admin/services/book_manage_service.dart';
 
 import '../widgets/book_manage_page.dart';
-
-import 'package:echoread/features/admin/services/book_manage_service.dart';
 
 class BookManagePage extends StatefulWidget {
   const BookManagePage({super.key});
@@ -48,35 +49,17 @@ class _BookManagePageState extends State<BookManagePage> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const GifLoader();
     }
 
-    final profileRoute = userDetail?['role']?.toString().isNotEmpty == true
-        ? userDetail!['role'] == 'user' ? '/profile' : '/admin'
-        : '/unauthorized';
-    final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
-        ? userDetail!['profile_img']
-        : 'profile/pggchhf3zntmicvhbxns';
-
     return Scaffold(
-      backgroundColor: Colors.lightBlue[50],
+      backgroundColor: const Color(0xFFFFF4ED),
       appBar: commonAppBar(
         context: context,
-        profileRoute: profileRoute,
-        profileImagePath: profileImage,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: BookManage(booksList: _books ?? [], authorsList: _authors ?? []),
-        // child: BookForm(
-        //     authorsList: _books ?? [],
-        //     onSubmit: (bookData) {
-        //     print("Book Submitted: $bookData");
-        //     // Save to list or backend here
-        //   },
-        // ),
       ),
     );
   }

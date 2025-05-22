@@ -1,8 +1,8 @@
-import 'package:echoread/core/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/widgets/book_card.dart';
 import 'package:echoread/core/widgets/library_category_item.dart';
+import 'package:echoread/core/widgets/show_snack_bar.dart';
 
 class MyLibraryScreen extends StatefulWidget {
   final List<Map<String, dynamic>> allBooks;
@@ -66,7 +66,7 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
                 ),
               ),
             ),
-            // Library Categories Section
+
             Column(
               children: libraryCategories.map((category) {
                 return libraryCategoryItem(
@@ -78,7 +78,6 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
                     if (route is String && route.isNotEmpty) {
                       Navigator.pushNamed(context, route);
                     } else {
-                      // Optionally handle no route, e.g. print or do nothing
                       showSnackBar(context, 'No route defined for this category');
                     }
                   },
@@ -88,7 +87,6 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
             ),
             const SizedBox(height: 30),
 
-            // My History Section
             const Padding(
               padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
               child: Text(
@@ -100,10 +98,9 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
                 ),
               ),
             ),
-            // List of My History Books (Vertical List)
             ListView.builder(
-              shrinkWrap: true, // Important for ListView inside SingleChildScrollView
-              physics: const NeverScrollableScrollPhysics(), // Prevent inner scrolling
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: _books.length,
               itemBuilder: (context, index) {
                 final book = _books[index];
@@ -118,7 +115,7 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
 
               },
             ),
-            const SizedBox(height: 20), // Space before bottom nav bar
+            const SizedBox(height: 20),
           ],
         ),
       );

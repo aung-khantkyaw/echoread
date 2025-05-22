@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/func.dart';
+
 import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
+import 'package:echoread/core/widgets/custom_gif_loading.dart';
 
 import '../widgets/book_detail_page.dart';
 
@@ -15,7 +17,6 @@ class BookDetailPage extends StatefulWidget {
   @override
   State<BookDetailPage> createState() => _BookDetailPageState();
 }
-
 
 class _BookDetailPageState extends State<BookDetailPage> {
 
@@ -46,25 +47,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const GifLoader();
     }
 
-    final profileRoute = userDetail?['role']?.toString().isNotEmpty == true
-        ? userDetail!['role'] == 'user' ? '/profile' : '/admin'
-        : '/unauthorized';
-    final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
-        ? userDetail!['profile_img']
-        : 'assets/icon/app_icon.png';
-
     return Scaffold(
-      backgroundColor: Colors.lightBlue[50],
+      backgroundColor: const Color(0xFFFFF4ED),
       appBar: commonAppBar(
         context: context,
-        profileRoute: profileRoute,
-        profileImagePath: profileImage,
-        //title: 'Authors', // Set title for Authors screens
       ),
       body: BookDetailsScreen(bookId: widget.bookId),
       bottomNavigationBar: const BottomNavBar(currentIndex: 1),

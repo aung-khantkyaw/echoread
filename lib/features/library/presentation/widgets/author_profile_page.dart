@@ -1,6 +1,7 @@
-import 'package:echoread/core/widgets/book_card.dart';
-import 'package:echoread/core/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
+
+import 'package:echoread/core/widgets/book_card.dart';
+import 'package:echoread/core/widgets/custom_gif_loading.dart';
 
 import '../../services/author_service.dart';
 
@@ -40,7 +41,7 @@ class _AuthorProfileScreenState extends State<AuthorProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const GifLoader();
     }
 
     final profileImg = authorDetail?['profile_img'] ??

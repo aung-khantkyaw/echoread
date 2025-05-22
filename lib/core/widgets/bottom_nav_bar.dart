@@ -27,28 +27,26 @@ class _BottomNavBarState extends State<BottomNavBar> {
   }
 
   void _onItemTapped(BuildContext context, int index) {
-    // Check if the current route is already the target route to avoid unnecessary navigation
     String? currentRoute = ModalRoute.of(context)?.settings.name;
     String targetRoute = '';
 
     switch (index) {
-      case 0: // Home
+      case 0:
         targetRoute = '/home';
         break;
       case 1:
-        targetRoute = '/explore'; // New route name
+        targetRoute = '/explore';
         break;
-      case 2: // Author List (New)
-        targetRoute = '/library'; // New route name
+      case 2:
+        targetRoute = '/library';
         break;
       case 3:
         targetRoute = '/setting';
         break;
       default:
-        return; // Do nothing for unknown indices
+        return;
     }
 
-    // Only navigate if the target route is different from the current route
     if (currentRoute != targetRoute && targetRoute.isNotEmpty) {
       Navigator.pushReplacementNamed(context, targetRoute);
     }
@@ -59,7 +57,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       currentIndex: widget.currentIndex,
-      selectedItemColor: Colors.blueAccent,
+      selectedItemColor: const Color(0xFFF56B00),
       unselectedItemColor: Colors.grey[600],
       selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
       unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),

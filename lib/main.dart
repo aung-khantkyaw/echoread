@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'core/config/firebase_config.dart';
+import 'core/widgets/custom_gif_loading.dart';
 import 'routes/app_router.dart';
 import 'core/utils/func.dart';
 
@@ -30,7 +31,7 @@ class EchoReadApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'EchoRead',
-      // theme: ThemeData(fontFamily: ''),
+      theme: ThemeData(fontFamily: 'AncizarSerif'),
       home: const SplashScreen(),
       onGenerateRoute: AppRouter.generateRoute,
     );
@@ -74,9 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
       future: _isLoggedInFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return const GifLoader();
         }
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
