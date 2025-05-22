@@ -48,7 +48,7 @@ class ProfileCard extends StatelessWidget {
                       // ),
                       image: DecorationImage(
                         image: NetworkImage(
-                          CloudinaryConfig.baseUrl(profileImg),
+                          CloudinaryConfig.baseUrl(profileImg, MediaType.image),
                         ),
                         fit: BoxFit.cover,
                       ),

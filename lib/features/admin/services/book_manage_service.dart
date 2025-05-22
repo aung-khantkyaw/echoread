@@ -1,6 +1,8 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:echoread/core/config/cloudinary_file_upload.dart';
 
 class BookManageService{
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -39,4 +41,40 @@ class BookManageService{
     }
   }
 
+  Future<void> createBook({
+    required File bookImage,
+    required File ebookFile,
+    required File audioFile,
+    required String bookName,
+    required String bookDescription,
+    required String authorId,
+  }) async {
+    try {
+      final cloudinaryUploader = CloudinaryFileUpload();
+
+      final bookImgPath = await cloudinaryUploader.uploadImageToCloudinary(bookImage, 'book_cover');
+      final ebookPath = await cloudinaryUploader.uploadPdfToCloudinary(ebookFile, 'ebooks');
+      final audioPath = await cloudinaryUploader.uploadAudioToCloudinary(audioFile, 'book_audio');
+
+      if (bookImgPath == null || ebookPath == null || audioPath == null) {
+        throw Exception('One or more uploads failed');
+      }
+
+      final bookData = {
+        'book_name': bookName,
+        'book_description': bookDescription,
+        'ebook_url': ebookPath,
+        'audio_url': audioPath,
+        'book_img': bookImgPath,
+        'author_id': authorId,
+        'created_at': FieldValue.serverTimestamp(),
+      };
+
+      log('Creating book: $bookData');
+      await _firestore.collection('books').add(bookData);
+    } catch (e, stackTrace) {
+      log('Error in createBook: $e', stackTrace: stackTrace);
+      rethrow;
+    }
+  }
 }

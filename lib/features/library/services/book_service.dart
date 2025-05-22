@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookService {
@@ -32,17 +34,29 @@ class BookService {
     }
   }
 
-  // Method to get a single book's details by book ID (for book detail page)
   Future<Map<String, dynamic>?> getBookDetail(String bookId) async {
     try {
-      final DocumentSnapshot doc = await _firestore.collection('books').doc(bookId).get();
-      if (doc.exists) {
-        return {'id': doc.id, ...doc.data() as Map<String, dynamic>};
-      }
-      return null;
-    } catch (e) {
-      print('Error getting book detail for ID $bookId: $e');
+      final doc = await _firestore.collection('books').doc(bookId).get();
+      if (!doc.exists) return null;
+
+      final bookData = doc.data()!;
+      final authorId = bookData['author_id'];
+
+      final authorDoc = await _firestore.collection('authors').doc(authorId).get();
+      final authorData = authorDoc.data();
+
+      final result = {
+        ...bookData,
+        'id': doc.id,
+        'author': authorData,
+      };
+
+      return result;
+    } catch (e, stackTrace) {
+      log('Unexpected error in getBookDetail: $e', stackTrace: stackTrace);
       return null;
     }
   }
+
+
 }

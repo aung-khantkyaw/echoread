@@ -24,13 +24,13 @@ class IconCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withAlpha(38),
               blurRadius: 10,
               spreadRadius: 2,
               offset: Offset(0, 4),
             ),
             BoxShadow(
-              color: Colors.blueAccent.withOpacity(0.1),
+              color: Colors.black.withAlpha(38),
               blurRadius: 12,
               spreadRadius: 1,
               offset: Offset(0, 6),

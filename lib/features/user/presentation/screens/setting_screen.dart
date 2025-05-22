@@ -4,21 +4,17 @@ import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 
-import '../widgets/book_detail_page.dart';
+import '../widgets/setting_page.dart';
 
-class BookDetailPage extends StatefulWidget {
-  final String bookId;
-
-  const BookDetailPage({super.key, required this.bookId});
-  static const String routeName = '/book-detail';
+class SettingPage extends StatefulWidget {
+  const SettingPage({super.key});
+  static const String routeName = '/setting';
 
   @override
-  State<BookDetailPage> createState() => _BookDetailPageState();
+  State<SettingPage> createState() => _SettingPageState();
 }
 
-
-class _BookDetailPageState extends State<BookDetailPage> {
-
+class _SettingPageState extends State<SettingPage> {
   Map<String, dynamic>? userDetail;
 
   bool isLoading = true;
@@ -26,15 +22,10 @@ class _BookDetailPageState extends State<BookDetailPage> {
   @override
   void initState() {
     super.initState();
-    loadData();
+    loadAllData();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  Future<void> loadData() async {
+  Future<void> loadAllData() async {
     final detail = await getUserDetail();
 
     setState(() {
@@ -42,6 +33,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
       isLoading = false;
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +48,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         : '/unauthorized';
     final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
         ? userDetail!['profile_img']
-        : 'assets/icon/app_icon.png';
+        : 'profile/pggchhf3zntmicvhbxns';
 
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
@@ -64,10 +56,13 @@ class _BookDetailPageState extends State<BookDetailPage> {
         context: context,
         profileRoute: profileRoute,
         profileImagePath: profileImage,
-        //title: 'Authors', // Set title for Authors screens
       ),
-      body: BookDetailsScreen(bookId: widget.bookId),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SettingsScreen(userDetail: userDetail!),
+      ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 3),
     );
   }
+
 }

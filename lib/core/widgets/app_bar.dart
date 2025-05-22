@@ -16,23 +16,32 @@ PreferredSizeWidget commonAppBar({
       title!,
       style: const TextStyle(
         fontSize: 20,
-        fontWeight: FontWeight.bold,
+        fontWeight: FontWeight.w900,
+        fontFamily: 'Cinzel'
       ),
     ),
     centerTitle: false,
     actions: [
       GestureDetector(
         onTap: () {
-          Navigator.pushReplacementNamed(context, profileRoute);
+          Navigator.pushReplacementNamed(context, '/admin');
         },
         child: Padding(
           padding: const EdgeInsets.only(right: 16.0),
-          child: CircleAvatar(
-            radius: 20,
-            backgroundImage: NetworkImage(
-              CloudinaryConfig.baseUrl(profileImagePath),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.black,
+                width: 2, // border width
+              ),
             ),
-            // no onBackgroundImageError here
+            child: CircleAvatar(
+              radius: 20,
+              backgroundImage: NetworkImage(
+                CloudinaryConfig.baseUrl(profileImagePath, MediaType.image),
+              ),
+            ),
           ),
         ),
       ),

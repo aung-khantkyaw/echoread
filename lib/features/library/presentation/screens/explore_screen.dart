@@ -4,38 +4,38 @@ import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 
-import '../../services/book_service.dart'; // Import BookService
-import '../widgets/home_page.dart';
+import '../../services/author_service.dart';
+import '../widgets/explore_page.dart';
 
-class HomePage extends StatefulWidget { // Change to StatefulWidget
-  const HomePage({super.key});
-  static const String routeName = '/home';
+class ExplorePage extends StatefulWidget {
+  const ExplorePage({super.key});
+  static const String routeName = '/explore';
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<ExplorePage> createState() => _ExplorePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  final BookService _bookService = BookService(); // Instantiate BookService
+class _ExplorePageState extends State<ExplorePage> {
+  final AuthorService _authorService = AuthorService();
 
   Map<String, dynamic>? userDetail;
-  List<Map<String, dynamic>>? _allBooks; // List to hold all books
+  List<Map<String, dynamic>>? _allAuthors;
 
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    loadAllData(); // Load user detail and all books
+    loadAllData();
   }
 
   Future<void> loadAllData() async {
     final detail = await getUserDetail();
-    final books = await _bookService.getBooks(); // Fetch all books using BookService
+    final authors = await _authorService.getAuthors();
 
     setState(() {
       userDetail = detail;
-      _allBooks = books;
+      _allAuthors = authors;
       isLoading = false;
     });
   }
@@ -66,12 +66,11 @@ class _HomePageState extends State<HomePage> {
 
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        // Pass the fetched books list to the HomePage widget (now a content widget)
-        child: HomeContentPage(allBooks: _allBooks ?? []), // Renamed to HomeContentPage to avoid conflict
-        // child: ForYouScreen(),
+        padding: const EdgeInsets.all(2.0),
+        // Pass the fetched books list to the ExplorePage widget (now a content widget)
+        child: ExplorerScreen(authorsList: _allAuthors ?? []), // Renamed to HomeContentPage to avoid conflict
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 0), // Highlight Home tab (index 0)
+      bottomNavigationBar: const BottomNavBar(currentIndex: 1), // Highlight Home tab (index 0)
     );
   }
 }

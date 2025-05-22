@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/func.dart';
-import 'package:echoread/core/widgets/common_app_bar.dart';
+import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 
 import '../widgets/admin_page.dart';
@@ -45,7 +45,7 @@ class _AdminPageState extends State<AdminPage> {
         : '/unauthorized';
     final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
         ? userDetail!['profile_img']
-        : 'assets/icon/app_icon.png';
+        : 'profile/pggchhf3zntmicvhbxns';
 
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
@@ -54,11 +54,11 @@ class _AdminPageState extends State<AdminPage> {
         profileRoute: profileRoute,
         profileImagePath: profileImage,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 16),
         child: Admin(userDetail: userDetail!),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 3),
     );
   }
 

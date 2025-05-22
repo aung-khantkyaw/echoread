@@ -2,7 +2,7 @@ import 'package:echoread/features/admin/services/author_manage_service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/func.dart';
-import 'package:echoread/core/widgets/common_app_bar.dart';
+import 'package:echoread/core/widgets/app_bar.dart';
 
 import '../widgets/book_manage_page.dart';
 
@@ -58,7 +58,7 @@ class _BookManagePageState extends State<BookManagePage> {
         : '/unauthorized';
     final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
         ? userDetail!['profile_img']
-        : 'assets/icon/app_icon.png';
+        : 'profile/pggchhf3zntmicvhbxns';
 
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],

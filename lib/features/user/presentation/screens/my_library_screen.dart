@@ -1,33 +1,41 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/func.dart';
-import 'package:echoread/core/widgets/common_app_bar.dart';
+import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 
-import '../widgets/profile_page.dart';
+import '../../services/book_service.dart';
+import '../widgets/my_library_page.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
-  static const String routeName = '/profile';
+class MyLibraryPage extends StatefulWidget {
+  const MyLibraryPage({super.key});
+  static const String routeName = '/library';
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<MyLibraryPage> createState() => _MyLibraryPageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _MyLibraryPageState extends State<MyLibraryPage> {
+  final BookService _bookService = BookService();
+
   Map<String, dynamic>? userDetail;
+  List<Map<String, dynamic>>? _allBooks;
+
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    loadUserDetail();
+    loadAllData();
   }
 
-  Future<void> loadUserDetail() async {
+  Future<void> loadAllData() async {
     final detail = await getUserDetail();
+    final books = await _bookService.getBooks(); // Fetch all books using BookService
+
     setState(() {
       userDetail = detail;
+      _allBooks = books;
       isLoading = false;
     });
   }
@@ -46,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
         : '/unauthorized';
     final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
         ? userDetail!['profile_img']
-        : 'echo_read/yw4zuxnmunuc87yb9gxn';
+        : 'profile/pggchhf3zntmicvhbxns';
 
     return Scaffold(
       backgroundColor: Colors.lightBlue[50],
@@ -57,10 +65,9 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Profile(userDetail: userDetail!),
+        child: MyLibraryScreen(allBooks: _allBooks ?? []),
       ),
-      // BottomNavBar currentIndex changed from 1 to 2
-      bottomNavigationBar: const BottomNavBar(currentIndex: 2), // Highlight Profile tab (index 2)
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2), 
     );
   }
 

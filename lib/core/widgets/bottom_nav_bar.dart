@@ -35,22 +35,15 @@ class _BottomNavBarState extends State<BottomNavBar> {
       case 0: // Home
         targetRoute = '/home';
         break;
-      case 1: // Author List (New)
-        targetRoute = '/author-list'; // New route name
+      case 1:
+        targetRoute = '/explore'; // New route name
         break;
-      case 2: // Profile (Index shifted)
-        if (userRole == 'admin') {
-          targetRoute = '/admin';
-        } else if (userRole == 'user') {
-          targetRoute = '/profile';
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Access denied: Unknown role')),
-          );
-          return; // Stop navigation if role is unknown
-        }
+      case 2: // Author List (New)
+        targetRoute = '/library'; // New route name
         break;
-    // If more items are added, add cases here
+      case 3:
+        targetRoute = '/setting';
+        break;
       default:
         return; // Do nothing for unknown indices
     }
@@ -64,28 +57,19 @@ class _BottomNavBarState extends State<BottomNavBar> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
       currentIndex: widget.currentIndex,
       selectedItemColor: Colors.blueAccent,
-      unselectedItemColor: Colors.grey[600], // Add unselected color for better visibility
+      unselectedItemColor: Colors.grey[600],
       selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
       unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
       onTap: (index) => _onItemTapped(context, index),
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_sharp),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem( // New Author Item
-          icon: Icon(Icons.people), // Or a suitable icon like Icons.book_rounded
-          label: 'Authors',
-        ),
-        BottomNavigationBarItem( // Profile Item (Index Shifted)
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-        // If more items are added, add them here
+        BottomNavigationBarItem(icon: Icon(Icons.home_sharp), label: 'Home'),
+        BottomNavigationBarItem(icon: Icon(Icons.explore_sharp), label: 'Explore'),
+        BottomNavigationBarItem(icon: Icon(Icons.local_library_sharp), label: 'My Library'),
+        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
       ],
-      // type: BottomNavigationBarType.fixed, // Optional: Use if you have more than 3 items
     );
   }
 }

@@ -4,21 +4,21 @@ import 'package:echoread/core/utils/func.dart';
 import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 
-import '../widgets/book_detail_page.dart';
+import '../widgets/author_profile_page.dart';
 
-class BookDetailPage extends StatefulWidget {
-  final String bookId;
+class AuthorProfilePage extends StatefulWidget {
+  final String authorId;
 
-  const BookDetailPage({super.key, required this.bookId});
-  static const String routeName = '/book-detail';
+  const AuthorProfilePage({super.key, required this.authorId});
+  static const String routeName = '/author-profile';
 
   @override
-  State<BookDetailPage> createState() => _BookDetailPageState();
+  State<AuthorProfilePage> createState() => _AuthorProfilePageState();
 }
 
 
-class _BookDetailPageState extends State<BookDetailPage> {
-
+class _AuthorProfilePageState extends State<AuthorProfilePage> {
+  
   Map<String, dynamic>? userDetail;
 
   bool isLoading = true;
@@ -66,7 +66,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
         profileImagePath: profileImage,
         //title: 'Authors', // Set title for Authors screens
       ),
-      body: BookDetailsScreen(bookId: widget.bookId),
+      body: AuthorProfileScreen(authorId: widget.authorId),
       bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );
   }

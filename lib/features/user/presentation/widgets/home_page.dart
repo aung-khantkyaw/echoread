@@ -1,85 +1,110 @@
 import 'package:flutter/material.dart';
-import 'package:echoread/features/library/presentation/screens/book_detail_screen.dart'; // Import the new screens
 
-class HomeContentPage extends StatelessWidget { // Renamed from Home to HomeContentPage
+import 'package:echoread/core/widgets/book_card.dart';
+import 'package:echoread/core/widgets/recommended_book_card.dart';
+
+class HomeContentPage extends StatefulWidget {
   final List<Map<String, dynamic>> allBooks; // Receive all books from parent
 
   const HomeContentPage({super.key, required this.allBooks});
 
-  // This method will now navigate to the book detail page
-  void _navigateToBookDetail(BuildContext context, String bookId, String bookName) {
-    Navigator.pushNamed(
-      context,
-      BookDetailScreen.routeName, // Use the defined routeName
-      arguments: bookId, // Pass only the bookId as a String argument
-    );
+  @override
+  State<HomeContentPage> createState() => _HomeContentPageState();
+}
+
+class _HomeContentPageState extends State<HomeContentPage> {
+  late List<Map<String, dynamic>> _books;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _books = List<Map<String, dynamic>>.from(widget.allBooks);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (allBooks.isEmpty) {
-      return const Center(
-        child: Text('No books available.'),
-      );
-    }
+    return SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-        childAspectRatio: 0.7,
-      ),
-      itemCount: allBooks.length,
-      itemBuilder: (context, index) {
-        final book = allBooks[index];
-        final bookId = book['id'] ?? '';
-        final bookName = book['book_name'] ?? 'Unknown Book';
-        final bookImg = book['book_img']?.toString().isNotEmpty == true
-            ? book['book_img']
-            : 'assets/icon/app_icon.png';
+            const Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
+              child: Text(
+                'Recommended for you',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            // Recommended Books (Horizontal Scroll)
+            SizedBox(
+              height: 270,
+              child: Scrollbar(
+                controller: _scrollController, // You need to define this controller
+                thumbVisibility: true, // Always show the scrollbar thumb
+                child: ListView.builder(
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  itemCount: _books.length,
+                  itemBuilder: (context, index) {
+                    final book = _books[index];
+                    return buildRecommendedBookCard(
+                      imageUrl: book['book_img'],
+                      title: book['book_name'] ?? '',
+                      author: book['author']?['author_name'] ?? '',
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
 
-        return GestureDetector(
-          onTap: () => _navigateToBookDetail(context, bookId, bookName), // Navigate to book detail
-          child: Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Image.network(
-                    bookImg,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Image.asset(
-                        'assets/icon/app_icon.png',
-                        fit: BoxFit.contain,
-                      );
-                    },
-                  ),
+            // Currently Reading Section
+            const Padding(
+              padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
+              child: Text(
+                'Currently Reading',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    bookName,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            // List of Currently Reading Books (Vertical List)
+            ListView.builder(
+              shrinkWrap: true, // Important for ListView inside SingleChildScrollView
+              physics: const NeverScrollableScrollPhysics(), // Prevent inner scrolling
+              itemCount: _books.length,
+              itemBuilder: (context, index) {
+                final book = _books[index];
+                return bookCard(
+                  context: context,
+                  bookId: book['id'] ?? '',
+                  imageUrl: book['book_img'] ?? '',
+                  title: book['book_name'] ?? '',
+                  subtitle: book['book_description'] ?? '',
+                  author: book['author']?['author_name'] ?? '',
+                );
+
+              },
+            ),
+            const SizedBox(height: 20), // Space before bottom nav bar
+          ],
+        )
     );
   }
+
+
 }

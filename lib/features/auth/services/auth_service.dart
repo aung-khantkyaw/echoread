@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/widgets/show_snack_bar.dart';
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -22,7 +24,7 @@ class AuthService {
       await _firestore.collection('users').doc(uid).set({
         'name': username,
         'email': email,
-        'profile_img': '',
+        'profile_img': 'profile/pggchhf3zntmicvhbxns',
         'role': 'user',
         'created_at': DateTime.now().toIso8601String(),
       });
@@ -95,22 +97,56 @@ class AuthService {
     }
   }
 
-
   Future<void> logout(BuildContext context) async {
     await _auth.signOut();
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-    await prefs.remove('userId');
-    await prefs.remove('userName');
-    await prefs.remove('userEmail');
-    await prefs.remove('userRole');
-    await prefs.remove('userProfileImg');
+    await prefs.clear();
 
     if (context.mounted) {
       Navigator.pushReplacementNamed(context, '/login');
     }
   }
+
+  Future<void> deleteAccount(BuildContext context) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+
+      if (user == null) {
+        throw FirebaseAuthException(
+          code: 'no-current-user',
+          message: 'No user is currently logged in.',
+        );
+      }
+
+      final uid = user.uid;
+
+      await user.delete();
+
+      await FirebaseFirestore.instance.collection('users').doc(uid).update({
+        'deleted': true,
+        'deleted_at': DateTime.now().toIso8601String(),
+      });
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      if (context.mounted) {
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+      }
+    } on FirebaseAuthException catch (e) {
+      log('FirebaseAuthException: ${e.code}');
+      showSnackBar(context, 'Error: ${e.message}', type: SnackBarType.error);
+    } catch (e) {
+      log('Unexpected error during account deletion: $e');
+      showSnackBar(
+        context,
+        'Failed to delete account. Please try again.',
+        type: SnackBarType.error,
+      );
+    }
+  }
+
 
   Future<void> saveLoginInfo(String uid, String name, String email, String role, String profileImg) async {
     final prefs = await SharedPreferences.getInstance();

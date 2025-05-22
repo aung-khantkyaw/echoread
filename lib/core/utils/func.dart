@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 Future<bool> checkIsLoggedIn() async {
   await Future.delayed(Duration(seconds: 3));
@@ -20,4 +21,9 @@ Future<Map<String, dynamic>?> getUserDetail() async {
     'role': prefs.getString('userRole') ?? '',
     'profile_img': prefs.getString('userProfileImg') ?? '',
   };
+}
+
+Future<bool> requestStoragePermission() async {
+  var status = await Permission.storage.request();
+  return status.isGranted;
 }
