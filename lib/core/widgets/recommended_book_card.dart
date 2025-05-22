@@ -8,14 +8,14 @@ Widget buildRecommendedBookCard({
   required String author,
 }) {
   return Container(
-    width: 140, // Width for each card
-    margin: const EdgeInsets.only(right: 16.0), // Space between cards
+    width: 140,
+    margin: const EdgeInsets.only(right: 16.0),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 120, // Book cover width
-          height: 180, // Book cover height
+          width: 120,
+          height: 180,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.0),
             boxShadow: [

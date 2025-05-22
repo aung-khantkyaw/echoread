@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../core/config/cloudinary_config.dart';
-import '../../../../core/widgets/pdf_view_screen.dart';
+
+import 'package:echoread/core/config/cloudinary_config.dart';
+
 import 'book_add_page.dart';
+
+import 'package:echoread/features/library/presentation/widgets/pdf_view_page.dart';
 
 class BookManage extends StatefulWidget {
   final List<Map<String, dynamic>> booksList;
@@ -53,7 +56,6 @@ class _BookManageState extends State<BookManage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Book image (if exists)
                       if (book['book_img'] != null && book['book_img'].toString().isNotEmpty)
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
@@ -85,7 +87,7 @@ class _BookManageState extends State<BookManage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => PdfViewScreen(publicId: book['ebook_url']),
+                              builder: (context) => PdfViewScreen(publicId: book['ebook_url'], title: book['book_name'],),
                             ),
                           )},
                         child: const Text("Go"),

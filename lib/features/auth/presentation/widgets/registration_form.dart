@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/validators.dart';
+
 import 'package:echoread/core/widgets/input_decoration.dart';
+
 import '../../services/auth_service.dart';
 
 class RegistrationForm extends StatefulWidget {
@@ -70,7 +72,7 @@ class _RegistrationFormState extends State<RegistrationForm> {
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Cinzel',
+              fontFamily: 'CinzelBold',
               color: Colors.black87,
             ),
           ),
@@ -142,10 +144,23 @@ class _RegistrationFormState extends State<RegistrationForm> {
                 style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
             ),
+
           SizedBox(
-            width: double.infinity, // takes full available width
+            width: double.infinity,
             child: ElevatedButton(
               onPressed: _isLoading ? null : _registration,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4B1E0A),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'AncizarSerifBold',
+                ),
+              ),
               child: _isLoading
                   ? const SizedBox(
                 width: 40,

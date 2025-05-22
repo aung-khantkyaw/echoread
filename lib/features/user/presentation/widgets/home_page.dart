@@ -4,7 +4,7 @@ import 'package:echoread/core/widgets/book_card.dart';
 import 'package:echoread/core/widgets/recommended_book_card.dart';
 
 class HomeContentPage extends StatefulWidget {
-  final List<Map<String, dynamic>> allBooks; // Receive all books from parent
+  final List<Map<String, dynamic>> allBooks;
 
   const HomeContentPage({super.key, required this.allBooks});
 
@@ -46,12 +46,11 @@ class _HomeContentPageState extends State<HomeContentPage> {
                 ),
               ),
             ),
-            // Recommended Books (Horizontal Scroll)
             SizedBox(
               height: 270,
               child: Scrollbar(
-                controller: _scrollController, // You need to define this controller
-                thumbVisibility: true, // Always show the scrollbar thumb
+                controller: _scrollController,
+                thumbVisibility: true,
                 child: ListView.builder(
                   controller: _scrollController,
                   scrollDirection: Axis.horizontal,
@@ -70,7 +69,6 @@ class _HomeContentPageState extends State<HomeContentPage> {
             ),
             const SizedBox(height: 30),
 
-            // Currently Reading Section
             const Padding(
               padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
               child: Text(
@@ -82,10 +80,9 @@ class _HomeContentPageState extends State<HomeContentPage> {
                 ),
               ),
             ),
-            // List of Currently Reading Books (Vertical List)
             ListView.builder(
-              shrinkWrap: true, // Important for ListView inside SingleChildScrollView
-              physics: const NeverScrollableScrollPhysics(), // Prevent inner scrolling
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: _books.length,
               itemBuilder: (context, index) {
                 final book = _books[index];
@@ -100,7 +97,7 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
               },
             ),
-            const SizedBox(height: 20), // Space before bottom nav bar
+            const SizedBox(height: 20),
           ],
         )
     );

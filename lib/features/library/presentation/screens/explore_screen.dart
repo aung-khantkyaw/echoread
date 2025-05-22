@@ -1,3 +1,4 @@
+import 'package:echoread/core/widgets/custom_gif_loading.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/func.dart';
@@ -42,35 +43,20 @@ class _ExplorePageState extends State<ExplorePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Show loading indicator while data is loading
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const GifLoader();
     }
 
-    // Determine profile route and image for the AppBar
-    final profileRoute = userDetail?['role']?.toString().isNotEmpty == true
-        ? userDetail!['role'] == 'user' ? '/profile' : '/admin'
-        : '/unauthorized';
-    final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
-        ? userDetail!['profile_img']
-        : 'profile/pggchhf3zntmicvhbxns'; // Default image
-
     return Scaffold(
-      backgroundColor: Colors.lightBlue[50], // Consistent background color
-      appBar: commonAppBar( // Use the common AppBar
+      backgroundColor: const Color(0xFFFFF4ED),
+      appBar: commonAppBar(
         context: context,
-        profileRoute: profileRoute,
-        profileImagePath: profileImage,
-
       ),
       body: Padding(
         padding: const EdgeInsets.all(2.0),
-        // Pass the fetched books list to the ExplorePage widget (now a content widget)
-        child: ExplorerScreen(authorsList: _allAuthors ?? []), // Renamed to HomeContentPage to avoid conflict
+        child: ExplorerScreen(authorsList: _allAuthors ?? []),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1), // Highlight Home tab (index 0)
+      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );
   }
 }

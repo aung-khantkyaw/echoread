@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:echoread/core/widgets/show_snack_bar.dart';
 
 import 'package:echoread/core/widgets/profile_card.dart';
-import '../../../auth/services/auth_service.dart';
+import 'package:echoread/features/auth/services/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   final Map<String, dynamic> userDetail;
@@ -41,7 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userDetail = widget.userDetail; // ✅ Correct usage
+    final userDetail = widget.userDetail;
     final AuthService authService = AuthService();
 
     final profileImage = userDetail['profile_img']?.toString().isNotEmpty == true

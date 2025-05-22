@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/func.dart';
+
 import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
+import 'package:echoread/core/widgets/custom_gif_loading.dart';
 
-import '../../services/book_service.dart'; // Import BookService
-import '../widgets/home_page.dart';
+import 'package:echoread/features/user/services/book_service.dart';
+import 'package:echoread/features/user/presentation/widgets/home_page.dart';
 
-class HomePage extends StatefulWidget { // Change to StatefulWidget
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
   static const String routeName = '/home';
 
@@ -16,22 +18,22 @@ class HomePage extends StatefulWidget { // Change to StatefulWidget
 }
 
 class _HomePageState extends State<HomePage> {
-  final BookService _bookService = BookService(); // Instantiate BookService
+  final BookService _bookService = BookService();
 
   Map<String, dynamic>? userDetail;
-  List<Map<String, dynamic>>? _allBooks; // List to hold all books
+  List<Map<String, dynamic>>? _allBooks;
 
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    loadAllData(); // Load user detail and all books
+    loadAllData();
   }
 
   Future<void> loadAllData() async {
     final detail = await getUserDetail();
-    final books = await _bookService.getBooks(); // Fetch all books using BookService
+    final books = await _bookService.getBooks();
 
     setState(() {
       userDetail = detail;
@@ -42,36 +44,20 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // Show loading indicator while data is loading
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const GifLoader();
     }
 
-    // Determine profile route and image for the AppBar
-    final profileRoute = userDetail?['role']?.toString().isNotEmpty == true
-        ? userDetail!['role'] == 'user' ? '/profile' : '/admin'
-        : '/unauthorized';
-    final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
-        ? userDetail!['profile_img']
-        : 'profile/pggchhf3zntmicvhbxns'; // Default image
-
     return Scaffold(
-      backgroundColor: Colors.lightBlue[50], // Consistent background color
-      appBar: commonAppBar( // Use the common AppBar
+      backgroundColor: const Color(0xFFFFF4ED),
+      appBar: commonAppBar(
         context: context,
-        profileRoute: profileRoute,
-        profileImagePath: profileImage,
-
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        // Pass the fetched books list to the HomePage widget (now a content widget)
-        child: HomeContentPage(allBooks: _allBooks ?? []), // Renamed to HomeContentPage to avoid conflict
-        // child: ForYouScreen(),
+        child: HomeContentPage(allBooks: _allBooks ?? []),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 0), // Highlight Home tab (index 0)
+      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/func.dart';
+
 import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/bottom_nav_bar.dart';
+import 'package:echoread/core/widgets/custom_gif_loading.dart';
 
-import '../widgets/setting_page.dart';
+import 'package:echoread/features/user/presentation/widgets/setting_page.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -34,28 +36,16 @@ class _SettingPageState extends State<SettingPage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const GifLoader();
     }
 
-    final profileRoute = userDetail?['role']?.toString().isNotEmpty == true
-        ? userDetail!['role'] == 'user' ? '/profile' : '/admin'
-        : '/unauthorized';
-    final profileImage = userDetail?['profile_img']?.toString().isNotEmpty == true
-        ? userDetail!['profile_img']
-        : 'profile/pggchhf3zntmicvhbxns';
-
     return Scaffold(
-      backgroundColor: Colors.lightBlue[50],
+      backgroundColor: const Color(0xFFFFF4ED),
       appBar: commonAppBar(
         context: context,
-        profileRoute: profileRoute,
-        profileImagePath: profileImage,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -64,5 +54,4 @@ class _SettingPageState extends State<SettingPage> {
       bottomNavigationBar: const BottomNavBar(currentIndex: 3),
     );
   }
-
 }

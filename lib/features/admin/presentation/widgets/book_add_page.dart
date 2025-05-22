@@ -6,10 +6,10 @@ import 'package:echoread/core/widgets/build_image_picker.dart';
 import 'package:echoread/core/widgets/build_file_picker.dart';
 import 'package:echoread/core/widgets/build_text_field.dart';
 import 'package:echoread/core/widgets/build_searchable_dropdown.dart';
-import 'package:echoread/core/widgets/show_snack_bar.dart';
 import 'package:echoread/core/utils/media_picker_helper.dart';
+import 'package:echoread/core/widgets/show_snack_bar.dart';
 
-import '../../services/book_manage_service.dart';
+import 'package:echoread/features/admin/services/book_manage_service.dart';
 
 class BookAddForm extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;

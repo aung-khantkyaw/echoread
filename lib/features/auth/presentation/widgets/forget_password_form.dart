@@ -1,3 +1,4 @@
+import 'package:echoread/core/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/validators.dart';
@@ -38,31 +39,16 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
         _isLoading = false;
       });
 
-      // Show result as a SnackBar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result ?? 'Something went wrong.'),
-          backgroundColor: result?.startsWith('Password') == true
-              ? Colors.green
-              : Colors.red,
-        ),
-      );
+      showSnackBar(context, result ?? 'Something went wrong.', type: SnackBarType.error);
     } catch (e) {
       setState(() {
         _isLoading = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An unexpected error occurred.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-
+      showSnackBar(context, 'An unexpected error occurred.', type: SnackBarType.error);
       debugPrint('Unexpected error: $e');
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +62,7 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Cinzel',
+              fontFamily: 'CinzelBold',
               color: Colors.black87,
             ),
           ),
@@ -97,9 +83,21 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
           const SizedBox(height: 20),
 
           SizedBox(
-            width: double.infinity, // takes full available width
+            width: double.infinity,
             child: ElevatedButton(
               onPressed: _isLoading ? null : _forget,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4B1E0A),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontFamily: 'AncizarSerifBold',
+                ),
+              ),
               child: _isLoading
                   ? const SizedBox(
                 width: 40,

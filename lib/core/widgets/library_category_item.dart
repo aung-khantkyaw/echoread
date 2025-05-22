@@ -16,7 +16,7 @@ Widget libraryCategoryItem({
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.grey[100], // Light grey background for the icon container
+              color: Colors.grey[100],
               borderRadius: BorderRadius.circular(10.0),
             ),
             child: Icon(

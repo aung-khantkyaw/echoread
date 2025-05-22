@@ -1,16 +1,21 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'package:echoread/core/widgets/app_bar.dart';
+import 'package:echoread/core/widgets/show_snack_bar.dart';
+
+
 class DownloadHistoryScreen extends StatefulWidget {
-  const DownloadHistoryScreen({Key? key}) : super(key: key);
+  const DownloadHistoryScreen({super.key});
   static const String routeName = '/download-history';
   @override
   State<DownloadHistoryScreen> createState() => _DownloadHistoryScreenState();
 }
 
 class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
-  // Get the current user's ID
   String? _currentUserId;
 
   @override
@@ -27,11 +32,9 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
         _currentUserId = user.uid;
       });
     } else {
-
-      print('User is not logged in.');
-
+      log('User is not logged in.');
       setState(() {
-        _currentUserId = 'T7WSeYtDek1G6GqQa1KK';//put  user id in here
+        _currentUserId = 'T7WSeYtDek1G6GqQa1KK';
       });
     }
   }
@@ -42,14 +45,11 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
           .collection('downloads')
           .doc(downloadDocId)
           .delete();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Download deleted successfully!')),
-      );
+      if (!mounted) return;
+      showSnackBar(context, 'Download deleted successfully!', type: SnackBarType.success);
     } catch (e) {
-      print('Error deleting download: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to delete download: $e')),
-      );
+      log('Error deleting download: $e');
+      showSnackBar(context, 'Failed to delete download.', type: SnackBarType.error);
     }
   }
 
@@ -61,17 +61,17 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
           title: const Text('Download History'),
           backgroundColor: Colors.blue,
         ),
-        body: const Center(child: CircularProgressIndicator()), // Show loading while fetching user ID
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      backgroundColor: Colors.lightBlue[50],
-      appBar: AppBar(
-        title: const Text('Download History'),
+      backgroundColor: const Color(0xFFFFF4ED),
+      appBar: commonAppBar(
+        context: context,
+        title: 'Download History'
       ),
       body: StreamBuilder<QuerySnapshot>(
-        // Query the 'downloads' collection for documents where 'user_id' matches current user
         stream: FirebaseFirestore.instance
             .collection('downloads')
             .where('user_id', isEqualTo: _currentUserId)
@@ -95,10 +95,9 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
               final downloadDoc = downloadDocs[index];
               final downloadData = downloadDoc.data() as Map<String, dynamic>;
               final bookId = downloadData['book_id'];
-              final downloadDocId = downloadDoc.id; // Get the document ID for deletion
+              final downloadDocId = downloadDoc.id;
 
               return FutureBuilder<DocumentSnapshot>(
-                // Fetch book details using the book_id from the download document
                 future: FirebaseFirestore.instance
                     .collection('books')
                     .doc(bookId)
@@ -132,11 +131,11 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
 
                   final bookData = bookSnapshot.data!.data() as Map<String, dynamic>;
                   final bookName = bookData['book_name'] ?? 'Unknown Book';
-                  final bookImg = bookData['book_img'] ?? ''; // Assuming you have a book_img field
+                  final bookImg = bookData['book_img'] ?? '';
 
                   return Dismissible(
-                    key: Key(downloadDocId), // Unique key for Dismissible
-                    direction: DismissDirection.endToStart, // Swipe from right to left
+                    key: Key(downloadDocId),
+                    direction: DismissDirection.endToStart,
                     background: Container(
                       color: Colors.red,
                       alignment: Alignment.centerRight,
@@ -177,7 +176,7 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
                           height: 50,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.book), // Fallback icon
+                          const Icon(Icons.book),
                         )
                             : const Icon(Icons.book, size: 50),
                         title: Text(bookName),

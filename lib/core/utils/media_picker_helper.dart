@@ -1,9 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 
-import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MediaPickerHelper {
   static Future<int> _getAndroidSdkInt() async {
@@ -28,7 +29,7 @@ class MediaPickerHelper {
         onImagePicked(File(picked.path));
         return true;
       } else {
-        print('No image selected.');
+        log('No image selected.');
         return false;
       }
     } else {
@@ -56,7 +57,7 @@ class MediaPickerHelper {
         onAudioPicked(result.files.single.path!);
         return true;
       } else {
-        print('No audio selected.');
+        log('No audio selected.');
         return false;
       }
     } else {

@@ -1,9 +1,10 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class CloudinaryFileUpload {
   Future<String?> uploadImageToCloudinary(File imageFile, String folderName) async {
@@ -35,16 +36,15 @@ class CloudinaryFileUpload {
       final secureUrl = jsonResp['secure_url'];
       final segments = Uri.parse(secureUrl).pathSegments;
 
-      // Extract path after "upload/.../<folderName>/..."
       final folderIndex = segments.indexOf(folderName);
       if (folderIndex != -1) {
         final filePath = segments.sublist(folderIndex).join('/');
-        return filePath; // e.g., "book_cover/ejd1yymzzdrqnxfisahg.webp"
+        return filePath;
       } else {
         return null;
       }
     } else {
-      print('Upload failed: ${response.statusCode}');
+      log('Upload failed: ${response.statusCode}');
       return null;
     }
   }
@@ -78,16 +78,15 @@ class CloudinaryFileUpload {
       final secureUrl = jsonResp['secure_url'];
       final segments = Uri.parse(secureUrl).pathSegments;
 
-      // Extract path after "upload/<folderName>/..."
       final folderIndex = segments.indexOf(folderName);
       if (folderIndex != -1) {
         final filePath = segments.sublist(folderIndex).join('/');
-        return filePath; // e.g., "ebooks/book_title.pdf"
+        return filePath;
       } else {
         return null;
       }
     } else {
-      print('PDF upload failed: ${response.statusCode}');
+      log('PDF upload failed: ${response.statusCode}');
       return null;
     }
   }
@@ -121,16 +120,15 @@ class CloudinaryFileUpload {
       final secureUrl = jsonResp['secure_url'];
       final segments = Uri.parse(secureUrl).pathSegments;
 
-      // Extract path after "upload/<folderName>/..."
       final folderIndex = segments.indexOf(folderName);
       if (folderIndex != -1) {
         final filePath = segments.sublist(folderIndex).join('/');
-        return filePath; // e.g., "book_audio/song_id.m4a"
+        return filePath;
       } else {
         return null;
       }
     } else {
-      print('Audio upload failed: ${response.statusCode}');
+      log('Audio upload failed: ${response.statusCode}');
       return null;
     }
   }

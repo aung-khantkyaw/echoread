@@ -1,5 +1,5 @@
-import 'package:echoread/core/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
+
 import '../config/cloudinary_config.dart';
 
 Widget bookCard({
@@ -7,14 +7,14 @@ Widget bookCard({
   required String title,
   required String subtitle,
   required String author,
-  required String bookId, // <-- Needed for navigation
+  required String bookId,
   required BuildContext context,
 }) {
   return GestureDetector(
     onTap: () {
       Navigator.pushReplacementNamed(
         context,
-        '/book-detail', // <-- Update this route based on your route setup
+        '/book-detail',
         arguments: {'bookId': bookId},
       );
     },

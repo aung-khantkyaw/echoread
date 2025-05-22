@@ -8,8 +8,6 @@ class Admin extends StatelessWidget {
 
   const Admin({super.key, required this.userDetail});
 
-
-
   @override
   Widget build(BuildContext context) {
     final profileImage = userDetail['profile_img']?.toString().isNotEmpty == true

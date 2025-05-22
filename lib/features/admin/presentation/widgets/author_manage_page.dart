@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import '../../services/author_manage_service.dart';
+import 'package:echoread/features/admin/services/author_manage_service.dart';
 
 class AuthorManage extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;
