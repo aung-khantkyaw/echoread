@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -52,6 +53,29 @@ class _BottomNavBarState extends State<BottomNavBar> {
     }
   }
 
+  List<BottomNavigationBarItem> _navBarItems(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
+    return [
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.home_sharp),
+        label: localizations.home,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.explore),
+        label: localizations.explore,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.library_books),
+        label: localizations.my_library,
+      ),
+      BottomNavigationBarItem(
+        icon: const Icon(Icons.settings),
+        label: localizations.settings_screen,
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
@@ -59,15 +83,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
       currentIndex: widget.currentIndex,
       selectedItemColor: const Color(0xFFF56B00),
       unselectedItemColor: Colors.grey[600],
-      selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
-      unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
       onTap: (index) => _onItemTapped(context, index),
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home_sharp), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.explore_sharp), label: 'Explore'),
-        BottomNavigationBarItem(icon: Icon(Icons.local_library_sharp), label: 'My Library'),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
-      ],
+      items: _navBarItems(context),
     );
   }
 }

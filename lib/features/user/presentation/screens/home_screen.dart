@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
         context: context,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(10.0),
         child: HomeContentPage(allBooks: _allBooks ?? []),
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 0),
