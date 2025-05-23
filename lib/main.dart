@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/config/firebase_config.dart';
 import 'core/widgets/custom_gif_loading.dart';
@@ -23,20 +26,87 @@ void main() async {
   runApp(const EchoReadApp());
 }
 
-class EchoReadApp extends StatelessWidget {
+class EchoReadApp extends StatefulWidget {
   const EchoReadApp({super.key});
+
+  static Future<void> toggleLocale(BuildContext context) async {
+    final _EchoReadAppState? state = context.findAncestorStateOfType<_EchoReadAppState>();
+
+    if (state != null) {
+      final currentLocale = state._locale.languageCode;
+      final newLocale = currentLocale == 'en' ? const Locale('my') : const Locale('en');
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('locale', newLocale.languageCode);
+
+      state.setLocale(newLocale);
+    }
+  }
+
+
+  @override
+  State<EchoReadApp> createState() => _EchoReadAppState();
+}
+
+class _EchoReadAppState extends State<EchoReadApp> {
+  Locale _locale = const Locale('en');
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocale();
+  }
+
+  Future<void> _loadLocale() async {
+    final prefs = await SharedPreferences.getInstance();
+    final languageCode = prefs.getString('locale') ?? 'en';
+
+    setState(() {
+      _locale = Locale(languageCode);
+    });
+  }
+
+  void setLocale(Locale locale) {
+    setState(() {
+      _locale = locale;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'EchoRead',
-      theme: ThemeData(fontFamily: 'AncizarSerif'),
-      home: const SplashScreen(),
-      onGenerateRoute: AppRouter.generateRoute,
+    double textScaleFactor = 1.0;
+
+    if (_locale.languageCode == 'my') {
+      textScaleFactor = 0.9;
+    }
+
+    return MediaQuery(
+      data: MediaQuery.of(context).copyWith(textScaleFactor: textScaleFactor),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'EchoRead',
+        theme: ThemeData(fontFamily: 'AncizarSerif'),
+        locale: _locale,
+        supportedLocales: const [
+          Locale('en'),
+          Locale('my'),
+        ],
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        home: const SplashScreen(),
+        onGenerateRoute: AppRouter.generateRoute,
+      ),
     );
   }
+
+
+
 }
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

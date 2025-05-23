@@ -1,7 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-
 import 'package:echoread/core/widgets/book_card.dart';
-import 'package:echoread/core/widgets/recommended_book_card.dart';
 
 class HomeContentPage extends StatefulWidget {
   final List<Map<String, dynamic>> allBooks;
@@ -14,94 +13,106 @@ class HomeContentPage extends StatefulWidget {
 
 class _HomeContentPageState extends State<HomeContentPage> {
   late List<Map<String, dynamic>> _books;
-  final ScrollController _scrollController = ScrollController();
+  final PageController _pageController = PageController(viewportFraction: 0.9);
+  late Timer _autoSlideTimer;
+  int _currentPage = 0;
+
+  final List<String> _heroImages = [
+    'assets/image/img_one.png',
+    'assets/image/img_two.jpeg',
+    'assets/image/img_three.jpeg',
+  ];
 
   @override
   void initState() {
     super.initState();
     _books = List<Map<String, dynamic>>.from(widget.allBooks);
+
+    _autoSlideTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (_pageController.hasClients) {
+        _currentPage = (_currentPage + 1) % _heroImages.length;
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 1000),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
+    _pageController.dispose();
+    _autoSlideTimer.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Hero image slider
+          SizedBox(
+            height: 200,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: _heroImages.length,
+              itemBuilder: (context, index) => _buildHeroImage(_heroImages[index]),
+            ),
+          ),
 
-            const Padding(
-              padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
-              child: Text(
-                'Recommended for you',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+          const SizedBox(height: 30),
+
+          // Section title
+          const Padding(
+            padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
+            child: Text(
+              'Currently Reading',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
               ),
             ),
-            SizedBox(
-              height: 270,
-              child: Scrollbar(
-                controller: _scrollController,
-                thumbVisibility: true,
-                child: ListView.builder(
-                  controller: _scrollController,
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  itemCount: _books.length,
-                  itemBuilder: (context, index) {
-                    final book = _books[index];
-                    return buildRecommendedBookCard(
-                      imageUrl: book['book_img'],
-                      title: book['book_name'] ?? '',
-                      author: book['author']?['author_name'] ?? '',
-                    );
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
+          ),
 
-            const Padding(
-              padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
-              child: Text(
-                'Currently Reading',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: _books.length,
-              itemBuilder: (context, index) {
-                final book = _books[index];
-                return bookCard(
-                  context: context,
-                  bookId: book['id'] ?? '',
-                  imageUrl: book['book_img'] ?? '',
-                  title: book['book_name'] ?? '',
-                  subtitle: book['book_description'] ?? '',
-                  author: book['author']?['author_name'] ?? '',
-                );
+          // Book list
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _books.length,
+            itemBuilder: (context, index) {
+              final book = _books[index];
+              return bookCard(
+                context: context,
+                bookId: book['id']?.toString() ?? '',
+                imageUrl: book['book_img'] ?? '',
+                title: book['book_name'] ?? '',
+                subtitle: book['book_description'] ?? '',
+                author: book['author']?['author_name'] ?? '',
+              );
+            },
+          ),
 
-              },
-            ),
-            const SizedBox(height: 20),
-          ],
-        )
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 
-
+  Widget _buildHeroImage(String imageUrl) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.asset(
+          imageUrl,
+          fit: BoxFit.cover,
+          width: double.infinity,
+        ),
+      ),
+    );
+  }
 }

@@ -84,7 +84,17 @@ class _DownloadHistoryScreenState extends State<DownloadHistoryScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('No downloads found.'));
+            return const Center(
+              child: Text(
+                'No downloads found.',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'AncizarSerifBold',
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            );
+
           }
 
           final downloadDocs = snapshot.data!.docs;

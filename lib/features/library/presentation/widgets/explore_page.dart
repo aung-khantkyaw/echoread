@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ExplorerScreen extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;
@@ -31,6 +32,8 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = AppLocalizations.of(context)!;
+
     return SafeArea(
       child: Center(
         child: ConstrainedBox(
@@ -49,18 +52,19 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                   ),
                   child: TextField(
                     onChanged: _filterAuthors,
-                    decoration: const InputDecoration(
-                      hintText: 'Search for authors',
-                      prefixIcon: Icon(Icons.search, color: Colors.black54),
-                      border: InputBorder.none, // Keep this to avoid default underline
-                      contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                    decoration: InputDecoration(
+                      hintText: locale.search_authors_hint,
+                      prefixIcon: const Icon(Icons.search, color: Colors.black54),
+                      border: InputBorder.none, // Avoid default underline
+                      contentPadding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Explore authors',
-                  style: TextStyle(
+                Text(
+                  locale.explore_authors,
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                   ),
@@ -68,10 +72,10 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                 const SizedBox(height: 12),
                 Expanded(
                   child: _authors.isEmpty
-                      ? const Center(
+                      ? Center(
                     child: Text(
-                      'No authors found',
-                      style: TextStyle(
+                      locale.no_authors_found,
+                      style: const TextStyle(
                         fontSize: 16,
                         color: Colors.black54,
                       ),
@@ -81,26 +85,26 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                     itemCount: _authors.length,
                     itemBuilder: (context, index) {
                       final author = _authors[index];
+                      final bookCount = author['book_count'] ?? 0;
                       return ListTile(
                         contentPadding: const EdgeInsets.symmetric(
                             vertical: 6, horizontal: 8),
                         leading: CircleAvatar(
                           radius: 28,
-                          // backgroundImage: NetworkImage(author['image'] ?? ''),
                           backgroundColor: Colors.blueGrey[100],
-                          child: Icon(Icons.person, color: Colors.black54),
+                          child: const Icon(Icons.person, color: Colors.black54),
                         ),
                         title: Text(
-                          author['name'] ?? 'Unknown Author',
+                          author['name'] ?? locale.unknown_author,
                           style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
                           ),
                         ),
                         subtitle: Text(
-                          author['book_count'] == 0
-                              ? 'No books'
-                              : '${author['book_count']} ${author['book_count'] == 1 ? 'book' : 'books'}',
+                          bookCount == 0
+                              ? locale.no_books
+                              : '$bookCount ${bookCount == 1 ? locale.book : locale.books}',
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.black54,
