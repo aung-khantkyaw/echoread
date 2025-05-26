@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:echoread/l10n/app_localizations.dart';
 
 class BottomNavBar extends StatefulWidget {
   final int currentIndex;
@@ -31,15 +31,17 @@ class _BottomNavBarState extends State<BottomNavBar> {
     String? currentRoute = ModalRoute.of(context)?.settings.name;
     String targetRoute = '';
 
+    final isAdmin = userRole == 'admin';
+
     switch (index) {
       case 0:
         targetRoute = '/home';
         break;
       case 1:
-        targetRoute = '/explore';
+        targetRoute = isAdmin ? '/author-manage' : '/explore';
         break;
       case 2:
-        targetRoute = '/library';
+        targetRoute = isAdmin ? '/book-manage' : '/library';
         break;
       case 3:
         targetRoute = '/setting';
@@ -55,6 +57,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
 
   List<BottomNavigationBarItem> _navBarItems(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
+    final isAdmin = userRole == 'admin';
 
     return [
       BottomNavigationBarItem(
@@ -62,12 +65,12 @@ class _BottomNavBarState extends State<BottomNavBar> {
         label: localizations.home,
       ),
       BottomNavigationBarItem(
-        icon: const Icon(Icons.explore),
-        label: localizations.explore,
+        icon: Icon(isAdmin ? Icons.person : Icons.explore),
+        label: isAdmin ? localizations.author : localizations.explore,
       ),
       BottomNavigationBarItem(
-        icon: const Icon(Icons.library_books),
-        label: localizations.my_library,
+        icon: Icon(isAdmin ? Icons.menu_book : Icons.library_books),
+        label: isAdmin ? localizations.book : localizations.my_library,
       ),
       BottomNavigationBarItem(
         icon: const Icon(Icons.settings),

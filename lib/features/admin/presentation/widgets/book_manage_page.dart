@@ -1,6 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/config/cloudinary_config.dart';
+
+import 'package:echoread/l10n/app_localizations.dart';
 
 import 'book_add_page.dart';
 
@@ -33,11 +37,14 @@ class _BookManageState extends State<BookManage> {
 
   @override
   Widget build(BuildContext context) {
+    log(widget.booksList.toString());
+    final locale = AppLocalizations.of(context)!;
+
     return Column(
       children: [
         ElevatedButton(
           onPressed: _goToAddBook,
-          child: const Text('Add Book'),
+          child: Text(locale.add_book),
         ),
         const SizedBox(height: 10),
         Expanded(
@@ -93,8 +100,13 @@ class _BookManageState extends State<BookManage> {
                         child: const Text("Go"),
                       ),
                       Text('Ebook URL: ${book['ebook_url'] ?? 'N/A'}'),
-                      Text('Audio URL: ${book['audio_url'] ?? 'N/A'}'),
-                      Text('Author ID: ${book['author_name'] ?? 'N/A'}'),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: (book['audio_urls'] as List<dynamic>?)?.map<Widget>((url) {
+                          return Text('Audio URL: $url');
+                        }).toList() ?? [const Text('Audio URL: N/A')],
+                      ),
+                      Text('Author ID: ${book['author']['author_name'] ?? 'N/A'}'),
                     ],
                   ),
                 ),
@@ -105,5 +117,4 @@ class _BookManageState extends State<BookManage> {
       ],
     );
   }
-
 }

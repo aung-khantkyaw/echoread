@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/custom_gif_loading.dart';
+import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 import 'package:echoread/core/utils/func.dart';
 
 import 'package:echoread/features/admin/services/author_manage_service.dart';
@@ -61,6 +62,7 @@ class _BookManagePageState extends State<BookManagePage> {
         padding: const EdgeInsets.all(16.0),
         child: BookManage(booksList: _books ?? [], authorsList: _authors ?? []),
       ),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 }

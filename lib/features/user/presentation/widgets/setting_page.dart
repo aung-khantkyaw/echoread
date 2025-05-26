@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import 'package:echoread/core/widgets/show_snack_bar.dart';
+import 'package:echoread/l10n/app_localizations.dart';
+
 import 'package:echoread/core/widgets/system_widget.dart';
 import 'package:echoread/core/widgets/profile_card.dart';
 
