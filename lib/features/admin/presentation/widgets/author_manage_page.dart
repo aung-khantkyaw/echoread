@@ -1,7 +1,11 @@
-import 'dart:developer';
-
+import 'package:echoread/features/admin/presentation/widgets/author_add_page.dart';
+import 'package:echoread/features/admin/presentation/widgets/author_update_page.dart';
 import 'package:flutter/material.dart';
-import 'package:echoread/features/admin/services/author_manage_service.dart';
+import 'package:echoread/l10n/app_localizations.dart';
+
+import 'package:echoread/core/config/cloudinary_config.dart';
+
+import '../../services/author_manage_service.dart';
 
 class AuthorManage extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;
@@ -13,188 +17,187 @@ class AuthorManage extends StatefulWidget {
 }
 
 class _AuthorManageState extends State<AuthorManage> {
-  final TextEditingController _controller = TextEditingController();
-  final AuthorManageService _service = AuthorManageService();
-
   late List<Map<String, dynamic>> _authors;
+  late List<Map<String, dynamic>> _allAuthors;
 
-  bool _isEditing = false;
-  String? _editingId;
+  final _authorService = AuthorManageService();
 
   @override
   void initState() {
     super.initState();
+    _allAuthors = List<Map<String, dynamic>>.from(widget.authorsList);
     _authors = List<Map<String, dynamic>>.from(widget.authorsList);
   }
 
-  Future<void> _addAuthor() async {
-    final name = _controller.text.trim();
-    if (name.isEmpty) return;
-
-    await _service.createAuthor(name);
-
+  void _filterAuthors(String query) {
     setState(() {
-      _authors.add({
-        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-        'name': name,
-      });
-      _controller.clear();
-    });
-
-    log('Created Author: $name');
-  }
-
-  void _startEdit(String id) {
-    final author = _authors.firstWhere((a) => a['id'] == id, orElse: () => {});
-    if (author.isEmpty) return;
-
-    setState(() {
-      _isEditing = true;
-      _editingId = id;
-      _controller.text = author['name'] ?? '';
+      _authors = _allAuthors
+          .where((author) =>
+          author['name']!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     });
   }
 
-  Future<void> _updateAuthor() async {
-    final name = _controller.text.trim();
-    if (name.isEmpty || _editingId == null) return;
-
-    await _service.updateAuthor(_editingId!, name);
-
-    final index = _authors.indexWhere((a) => a['id'] == _editingId);
-    if (index == -1) return;
-
-    setState(() {
-      _authors[index]['name'] = name;
-      _isEditing = false;
-      _editingId = null;
-      _controller.clear();
-    });
-
-    log('Updated Author: $name');
-  }
-
-  Future<void> _deleteAuthor(String id) async {
-    final author = _authors.firstWhere((a) => a['id'] == id, orElse: () => {});
-    if (author.isEmpty) return;
-
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: Text('Are you sure you want to delete "${author['name']}"?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
-          ),
-        ],
+  void _goToAddAuthor() async {
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AuthorAddPage(authorsList: widget.authorsList),
       ),
     );
 
-    if (confirm != true) return;
-
-    await _service.deleteAuthor(id);
-
-    setState(() {
-      _authors.removeWhere((a) => a['id'] == id);
-
-      if (_isEditing && _editingId == id) {
-        _isEditing = false;
-        _editingId = null;
-        _controller.clear();
-      }
-
-      log('Deleted Author with id: $id');
-    });
+    // Fetch latest authors from DB/API
+    if (result != null) {
+      final freshAuthors = await _authorService.getAuthors();
+      setState(() {
+        _authors = freshAuthors;
+        _allAuthors = freshAuthors;
+      });
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
+    final locale = AppLocalizations.of(context)!;
+
+    return SafeArea(
+      child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
+                ElevatedButton(
+                  onPressed: _goToAddAuthor,
+                  child: Text(locale.add_author),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white, // White background
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade300), // Light grey border
+                  ),
                   child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter author name',
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                      border: InputBorder.none,
+                    onChanged: _filterAuthors,
+                    decoration: InputDecoration(
+                      hintText: locale.search_authors_hint,
+                      prefixIcon: const Icon(Icons.search, color: Colors.black54),
+                      border: InputBorder.none, // Avoid default underline
+                      contentPadding:
+                      const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 48,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(7),
-                          bottomRight: Radius.circular(7),
-                        ),
+                const SizedBox(height: 24),
+
+                Expanded(
+                  child: _authors.isEmpty
+                      ? Center(
+                    child: Text(
+                      locale.no_authors_found,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
                       ),
-                      elevation: 0,
-                      backgroundColor: Colors.white,
                     ),
-                    onPressed: _isEditing ? _updateAuthor : _addAuthor,
-                    child: Text(_isEditing ? 'Update' : 'Add'),
-                  ),
+                  )
+                      :ListView.builder(
+                    itemCount: _authors.length,
+                      itemBuilder: (context, index) {
+                        final author = _authors[index];
+                        final bookCount = author['book_count'] ?? 0;
+
+                        return Dismissible(
+                          key: Key(author['id'].toString()),
+                          background: Container(
+                            color: Colors.red,
+                            padding: const EdgeInsets.only(left: 20),
+                            alignment: Alignment.centerLeft,
+                            child: const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          secondaryBackground: Container(
+                            color: Colors.blue,
+                            padding: const EdgeInsets.only(right: 20),
+                            alignment: Alignment.centerRight,
+                            child: const Icon(Icons.edit, color: Colors.white),
+                          ),
+                          confirmDismiss: (direction) async {
+                            if (direction == DismissDirection.startToEnd) {
+                              return await showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text(locale.confirm_delete),
+                                  content: Text(locale.delete_author),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text(locale.cancel)),
+                                    TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text(locale.delete)),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AuthorUpdatePage(
+                                    authorId: author['id'],
+                                    authorName: author['name'],
+                                    profileImg: author['profile_img'],
+                                  ),
+                                ),
+                              );
+                              return false;
+                            }
+                          },
+                          onDismissed: (direction) async {
+                            if (direction == DismissDirection.startToEnd) {
+                              await _authorService.deleteAuthor(author['id']);
+                              final freshAuthors = await _authorService.getAuthors();
+                              setState(() {
+                                _authors = freshAuthors;
+                                _allAuthors = freshAuthors;
+                              });
+                            }
+                          },
+                          child: Column(
+                            children: [
+                              ListTile(
+                                contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                                leading: CircleAvatar(
+                                  radius: 28,
+                                  backgroundColor: Colors.blueGrey[100],
+                                  backgroundImage: (author['profile_img'] != null && author['profile_img'].toString().isNotEmpty)
+                                      ? NetworkImage(CloudinaryConfig.baseUrl(author['profile_img'], MediaType.image))
+                                      : null,
+                                  child: (author['profile_img'] == null || author['profile_img'].toString().isEmpty)
+                                      ? const Icon(Icons.person, color: Colors.black54)
+                                      : null,
+                                ),
+                                title: Text(
+                                  author['name'] ?? locale.unknown_author,
+                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                                ),
+                                subtitle: Text(
+                                  bookCount == 0 ? locale.no_books : '$bookCount ${bookCount == 1 ? locale.book : locale.books}',
+                                  style: const TextStyle(fontSize: 14, color: Colors.black54),
+                                ),
+                                onTap: () => Navigator.pushReplacementNamed(
+                                  context,
+                                  '/author-profile',
+                                  arguments: {'authorId': author['id']},
+                                ),
+                              ),
+                              const Divider(height: 1),
+                            ],
+                          ),
+                        );
+                      }
+                  )
                 ),
               ],
             ),
           ),
-        ),
-
-        Expanded(
-          child: _authors.isEmpty
-              ? const Center(child: Text('No authors available.'))
-              : ListView.builder(
-            itemCount: _authors.length,
-            itemBuilder: (context, index) {
-              final author = _authors[index];
-              return GestureDetector(
-                onTap: () => _startEdit(author['id']),
-                child: Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            author['name'] ?? 'Unknown Author',
-                            style: const TextStyle(fontSize: 16),
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _deleteAuthor(author['id'])
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

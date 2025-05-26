@@ -4,14 +4,15 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:echoread/core/config/cloudinary_file_upload.dart';
 
-class BookManageService{
+class BookManageService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<List<Map<String, dynamic>>> getBooks() async {
     try {
       final booksSnapshot = await _firestore.collection('books').get();
 
-      final books = booksSnapshot.docs.map((doc) => {
+      final books = booksSnapshot.docs.map((doc) =>
+      {
         ...doc.data(),
         'id': doc.id,
       }).toList();
@@ -30,11 +31,11 @@ class BookManageService{
         for (var doc in authorsSnapshot.docs) doc.id: doc.data()
       };
 
-      return books.map((book) => {
+      return books.map((book) =>
+      {
         ...book,
         'author': authorsMap[book['author_id']],
       }).toList();
-
     } catch (e, stackTrace) {
       log('Unexpected error in getBooks: $e', stackTrace: stackTrace);
       return [];
@@ -44,7 +45,7 @@ class BookManageService{
   Future<void> createBook({
     required File bookImage,
     required File ebookFile,
-    required File audioFile,
+    required List<File> audioFiles,
     required String bookName,
     required String bookDescription,
     required String authorId,
@@ -53,10 +54,19 @@ class BookManageService{
       final cloudinaryUploader = CloudinaryFileUpload();
 
       final bookImgPath = await cloudinaryUploader.uploadImageToCloudinary(bookImage, 'book_cover');
-      final ebookPath = await cloudinaryUploader.uploadPdfToCloudinary(ebookFile, 'ebooks');
-      final audioPath = await cloudinaryUploader.uploadAudioToCloudinary(audioFile, 'book_audio');
 
-      if (bookImgPath == null || ebookPath == null || audioPath == null) {
+      final ebookPath = await cloudinaryUploader.uploadPdfToCloudinary(ebookFile, 'ebooks');
+
+      final List<String> audioPaths = [];
+      for (final audioFile in audioFiles) {
+        final audioPath =
+        await cloudinaryUploader.uploadAudioToCloudinary(
+            audioFile, 'book_audio');
+        if (audioPath == null) throw Exception('Audio upload failed');
+        audioPaths.add(audioPath);
+      }
+
+      if (bookImgPath == null || ebookPath == null || audioPaths.isEmpty) {
         throw Exception('One or more uploads failed');
       }
 
@@ -64,7 +74,7 @@ class BookManageService{
         'book_name': bookName,
         'book_description': bookDescription,
         'ebook_url': ebookPath,
-        'audio_url': audioPath,
+        'audio_urls': audioPaths,
         'book_img': bookImgPath,
         'author_id': authorId,
         'created_at': FieldValue.serverTimestamp(),

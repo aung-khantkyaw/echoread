@@ -4,6 +4,7 @@ Widget buildFilePicker({
   required String label,
   required String? filePath,
   required VoidCallback onPressed,
+  String placeholder = 'No file selected'
 }) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 16),
@@ -22,7 +23,7 @@ Widget buildFilePicker({
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  filePath != null ? filePath.split('/').last : 'No file selected',
+                  filePath != null ? filePath.split('/').last : placeholder,
                   style: const TextStyle(fontSize: 14, color: Colors.black87),
                 ),
               ),

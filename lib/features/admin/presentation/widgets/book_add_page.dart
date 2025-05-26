@@ -11,6 +11,8 @@ import 'package:echoread/core/widgets/show_snack_bar.dart';
 
 import 'package:echoread/features/admin/services/book_manage_service.dart';
 
+import 'package:echoread/l10n/app_localizations.dart';
+
 class BookAddForm extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;
 
@@ -31,12 +33,11 @@ class _BookAddFormState extends State<BookAddForm> {
   String? _selectedAuthorId;
   File? _pickedImage;
   String? _ebookFilePath;
-  String? _audioFilePath;
+  List<String?> _audioFilePaths = [null];
 
   List<Map<String, dynamic>> _filteredAuthors = [];
 
   final _bookService = BookManageService();
-
   bool _isLoading = false;
 
   @override
@@ -79,9 +80,9 @@ class _BookAddFormState extends State<BookAddForm> {
     }
   }
 
-  Future<void> _pickAudioFile() async {
+  Future<void> _pickAudioFile(int index) async {
     final success = await MediaPickerHelper.pickAudio((path) {
-      setState(() => _audioFilePath = path);
+      setState(() => _audioFilePaths[index] = path);
     });
 
     if (!mounted) return;
@@ -104,17 +105,21 @@ class _BookAddFormState extends State<BookAddForm> {
   }
 
   Future<void> _submitForm() async {
-    if (_formKey.currentState!.validate() &&
-        _selectedAuthorId != null &&
-        _pickedImage != null &&
-        _ebookFilePath != null &&
-        _audioFilePath != null) {
+    final isValid = _formKey.currentState!.validate();
+    final hasAudio = _audioFilePaths.any((path) => path != null && path.isNotEmpty);
+
+    if (isValid && _selectedAuthorId != null && _pickedImage != null && _ebookFilePath != null && hasAudio) {
       setState(() => _isLoading = true);
       try {
+        final audioFiles = _audioFilePaths
+            .where((path) => path != null && path.isNotEmpty)
+            .map((path) => File(path!))
+            .toList();
+
         await _bookService.createBook(
           bookImage: _pickedImage!,
           ebookFile: File(_ebookFilePath!),
-          audioFile: File(_audioFilePath!),
+          audioFiles: audioFiles,
           bookName: _nameController.text,
           bookDescription: _descController.text,
           authorId: _selectedAuthorId!,
@@ -122,7 +127,6 @@ class _BookAddFormState extends State<BookAddForm> {
 
         if (!mounted) return;
         showSnackBar(context, 'Book created successfully', type: SnackBarType.success);
-
         Navigator.pop(context);
       } catch (e) {
         if (!mounted) return;
@@ -137,8 +141,10 @@ class _BookAddFormState extends State<BookAddForm> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Book')),
+      appBar: AppBar(title: Text(locale.add_book)),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -147,15 +153,15 @@ class _BookAddFormState extends State<BookAddForm> {
               key: _formKey,
               child: Column(
                 children: [
-                  buildImagePicker(filePath: _pickedImage, onPressed: _pickImage),
+                  buildImagePicker(filePath: _pickedImage, onPressed: _pickImage, placeholderText: locale.select_image_hint),
                   buildTextField(
-                    label: 'Book Name',
+                    label: locale.book_name,
                     controller: _nameController,
                     validator: (v) => v == null || v.isEmpty ? 'Enter book name' : null,
                   ),
                   buildSearchableDropdown(
                     context: context,
-                    label: 'Search Author',
+                    label: locale.select_author,
                     controller: _authorSearchController,
                     filteredItems: _filteredAuthors,
                     selectedId: _selectedAuthorId,
@@ -171,17 +177,35 @@ class _BookAddFormState extends State<BookAddForm> {
                     },
                   ),
                   buildFilePicker(
-                    label: 'Ebook File',
+                    label: locale.ebook_file,
                     filePath: _ebookFilePath,
                     onPressed: _pickEbookFile,
+                    placeholder: locale.no_file_selected
                   ),
-                  buildFilePicker(
-                    label: 'Audio File',
-                    filePath: _audioFilePath,
-                    onPressed: _pickAudioFile,
+                  Column(
+                    children: [
+                      ...List.generate(_audioFilePaths.length, (index) {
+                        return buildFilePicker(
+                          label: '${locale.audio_file} ${index + 1}',
+                          filePath: _audioFilePaths[index],
+                          onPressed: () => _pickAudioFile(index),
+                          placeholder: locale.no_file_selected
+                        );
+                      }),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            setState(() => _audioFilePaths.add(null));
+                          },
+                          icon: const Icon(Icons.add),
+                          label: Text(locale.add_another_audio_file),
+                        ),
+                      ),
+                    ],
                   ),
                   buildTextField(
-                    label: 'Book Description',
+                    label: locale.book_description,
                     controller: _descController,
                     validator: (v) => v == null || v.isEmpty ? 'Enter description' : null,
                     maxLines: 3,
@@ -189,7 +213,7 @@ class _BookAddFormState extends State<BookAddForm> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _submitForm,
-                    child: const Text('Save Book'),
+                    child: Text(locale.save_book),
                   ),
                 ],
               ),
