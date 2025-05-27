@@ -41,7 +41,6 @@ Widget buildSearchableDropdown({
             },
           ),
         ),
-      const SizedBox(height: 16),
     ],
   );
 }

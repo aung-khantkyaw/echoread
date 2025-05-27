@@ -1,7 +1,9 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
+import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/build_image_picker.dart';
 import 'package:echoread/core/widgets/build_file_picker.dart';
 import 'package:echoread/core/widgets/build_text_field.dart';
@@ -33,12 +35,14 @@ class _BookAddFormState extends State<BookAddForm> {
   String? _selectedAuthorId;
   File? _pickedImage;
   String? _ebookFilePath;
-  List<String?> _audioFilePaths = [null];
+  final List<String?> _audioFilePaths = [null];
 
   List<Map<String, dynamic>> _filteredAuthors = [];
 
-  final _bookService = BookManageService();
+  final BookManageService _bookService = BookManageService();
+  final List<bool> _isUploadingAudioList = [false];
   bool _isLoading = false;
+  bool _isUploadingEbook = false;
 
   @override
   void initState() {
@@ -66,6 +70,8 @@ class _BookAddFormState extends State<BookAddForm> {
   }
 
   Future<void> _pickEbookFile() async {
+    setState(() => _isUploadingEbook = true);
+
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'epub'],
@@ -74,20 +80,30 @@ class _BookAddFormState extends State<BookAddForm> {
     if (!mounted) return;
 
     if (result != null && result.files.single.path != null) {
-      setState(() => _ebookFilePath = result.files.single.path!);
+      setState(() {
+        _ebookFilePath = result.files.single.path!;
+        _isUploadingEbook = false;
+      });
     } else {
+      setState(() => _isUploadingEbook = false);
       showSnackBar(context, 'No ebook file selected.', type: SnackBarType.error);
     }
   }
 
   Future<void> _pickAudioFile(int index) async {
+    setState(() => _isUploadingAudioList[index] = true);
+
     final success = await MediaPickerHelper.pickAudio((path) {
-      setState(() => _audioFilePaths[index] = path);
+      setState(() {
+        _audioFilePaths[index] = path;
+        _isUploadingAudioList[index] = false;
+      });
     });
 
     if (!mounted) return;
 
     if (!success) {
+      setState(() => _isUploadingAudioList[index] = false);
       showSnackBar(context, 'Please allow audio access to select a file.', type: SnackBarType.error);
     }
   }
@@ -116,6 +132,7 @@ class _BookAddFormState extends State<BookAddForm> {
             .map((path) => File(path!))
             .toList();
 
+        log('Calling createBook...');
         await _bookService.createBook(
           bookImage: _pickedImage!,
           ebookFile: File(_ebookFilePath!),
@@ -144,7 +161,10 @@ class _BookAddFormState extends State<BookAddForm> {
     final locale = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(title: Text(locale.add_book)),
+      appBar: commonAppBar(
+        context: context,
+        title: locale.add_book
+      ),
       body: Stack(
         children: [
           SingleChildScrollView(
@@ -176,27 +196,43 @@ class _BookAddFormState extends State<BookAddForm> {
                       return _selectedAuthorId == null ? 'Select an author' : null;
                     },
                   ),
+
+                  const SizedBox(height: 8),
+
                   buildFilePicker(
                     label: locale.ebook_file,
                     filePath: _ebookFilePath,
                     onPressed: _pickEbookFile,
-                    placeholder: locale.no_file_selected
+                    placeholder: locale.no_file_selected,
+                    isUploading: _isUploadingEbook,
                   ),
+
+                  const SizedBox(height: 8),
+
                   Column(
                     children: [
                       ...List.generate(_audioFilePaths.length, (index) {
-                        return buildFilePicker(
-                          label: '${locale.audio_file} ${index + 1}',
-                          filePath: _audioFilePaths[index],
-                          onPressed: () => _pickAudioFile(index),
-                          placeholder: locale.no_file_selected
+                        return Column(
+                          children: [
+                            buildFilePicker(
+                              label: '${locale.audio_file} ${index + 1}',
+                              filePath: _audioFilePaths[index],
+                              onPressed: () => _pickAudioFile(index),
+                              placeholder: locale.no_file_selected,
+                              isUploading: _isUploadingAudioList[index],
+                            ),
+                            const SizedBox(height: 12), // padding between file pickers
+                          ],
                         );
                       }),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton.icon(
                           onPressed: () {
-                            setState(() => _audioFilePaths.add(null));
+                            setState(() {
+                              _audioFilePaths.add(null);
+                              _isUploadingAudioList.add(false);
+                            });
                           },
                           icon: const Icon(Icons.add),
                           label: Text(locale.add_another_audio_file),
@@ -204,15 +240,30 @@ class _BookAddFormState extends State<BookAddForm> {
                       ),
                     ],
                   ),
+
+                  const SizedBox(height: 8),
+
                   buildTextField(
                     label: locale.book_description,
                     controller: _descController,
                     validator: (v) => v == null || v.isEmpty ? 'Enter description' : null,
-                    maxLines: 3,
+                    maxLines: 5,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF8C2D),
+                      foregroundColor: const Color(0xFF4B1E0A),
+                      minimumSize: const Size.fromHeight(45),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'AncizarSerifBold',
+                      ),
+                    ),
                     child: Text(locale.save_book),
                   ),
                 ],

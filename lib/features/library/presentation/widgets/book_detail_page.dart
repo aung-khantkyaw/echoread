@@ -99,27 +99,39 @@ class BookDetailsScreen extends StatelessWidget {
                 Column(
                   children: [
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.picture_as_pdf),
-                      label: const Text("Read Ebook"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFF8C2D),
-                        foregroundColor: const Color(0xFF4B1E0A),
-                        minimumSize: const Size.fromHeight(45),
-                      ),
-                      onPressed: () {
-                        final ebookUrl = book['ebook_url'];
-                        if (ebookUrl != null && ebookUrl.isNotEmpty) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PdfViewScreen(
-                                publicId: ebookUrl,
-                                title: book['book_name'] ?? 'Ebook',
+                        icon: const Icon(Icons.picture_as_pdf),
+                        label: const Text("Read Ebook"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF8C2D),
+                          foregroundColor: const Color(0xFF4B1E0A),
+                          minimumSize: const Size.fromHeight(45),
+                        ),
+                        onPressed: () {
+                          final ebookParts = book['ebook_urls'];
+                          if (ebookParts != null &&
+                              ebookParts is List &&
+                              ebookParts.every((e) => e is String)) {
+
+                            // publicId list ကို full URL list အဖြစ်ပြောင်းမယ်
+                            final List<String> urls = ebookParts.map((publicId) {
+                              return CloudinaryConfig.baseUrl(publicId, MediaType.ebook);
+                            }).toList();
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => PdfMergedViewScreen(
+                                  parts: urls, // full URL list ပေးလိုက်တာ
+                                  title: book['book_name'] ?? 'Ebook',
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Invalid ebook parts list')),
+                            );
+                          }
                         }
-                      },
                     ),
                     const SizedBox(height: 10),
                     ElevatedButton.icon(
@@ -131,8 +143,17 @@ class BookDetailsScreen extends StatelessWidget {
                         minimumSize: const Size.fromHeight(45),
                       ),
                       onPressed: () {
-                        final audioUrl = book['audio_url'];
-                        if (audioUrl != null && audioUrl.isNotEmpty) {
+                        final audioParts = book['audio_urls'];
+                        if (audioParts != null &&
+                            audioParts is List &&
+                            audioParts.every((e) => e is String) &&
+                            audioParts.isNotEmpty) {
+
+                          // publicId list ကို full URL list အဖြစ်ပြောင်းမယ်
+                          final List<String> urls = audioParts.map((audioPart) {
+                            return CloudinaryConfig.baseUrl(audioPart, MediaType.audio);
+                          }).toList();
+
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -140,13 +161,18 @@ class BookDetailsScreen extends StatelessWidget {
                                 title: book['book_name'] ?? '',
                                 author: author['author_name'] ?? '',
                                 coverImageUrl: imageUrl ?? '',
-                                audioUrl: audioUrl,
+                                audioUrls: urls,  // list of URLs
                               ),
                             ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Invalid audio parts list')),
                           );
                         }
                       },
                     ),
+
                     const SizedBox(height: 10),
                     ElevatedButton.icon(
                       icon: const Icon(Icons.bookmark),

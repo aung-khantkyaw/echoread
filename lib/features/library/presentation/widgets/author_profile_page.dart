@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:echoread/core/config/cloudinary_config.dart';
+
 import 'package:echoread/core/widgets/book_card.dart';
 import 'package:echoread/core/widgets/custom_gif_loading.dart';
+
+import 'package:echoread/l10n/app_localizations.dart';
 
 import '../../services/author_service.dart';
 
@@ -40,6 +44,8 @@ class _AuthorProfileScreenState extends State<AuthorProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = AppLocalizations.of(context)!;
+
     if (isLoading) {
       return const GifLoader();
     }
@@ -56,7 +62,13 @@ class _AuthorProfileScreenState extends State<AuthorProfileScreen> {
               children: [
                 CircleAvatar(
                   radius: 60,
-                  backgroundImage: NetworkImage(profileImg),
+                  backgroundColor: Colors.blueGrey[100],
+                  backgroundImage: (profileImg != null && profileImg.toString().isNotEmpty)
+                      ? NetworkImage(CloudinaryConfig.baseUrl(profileImg, MediaType.image))
+                      : null,
+                  child: (profileImg == null || profileImg.toString().isEmpty)
+                      ? const Icon(Icons.person, color: Colors.black54)
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -66,21 +78,26 @@ class _AuthorProfileScreenState extends State<AuthorProfileScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Text(
-                  'Author',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                Text(
+                  authorBooks.isEmpty
+                      ? locale.no_books
+                      : '${authorBooks.length} ${authorBooks.length == 1} ? locale.book : locale.books}',
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 30),
-          const Padding(
-            padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
-            child: Text(
-              'Books',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-          ),
+          ...[
+            if (authorBooks.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
+                child: Text(
+                  locale.books,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                ),
+              ),
+          ],
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),

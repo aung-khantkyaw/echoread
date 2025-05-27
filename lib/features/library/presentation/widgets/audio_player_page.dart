@@ -1,22 +1,19 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-
-import 'package:echoread/core/config/cloudinary_config.dart';
+import 'dart:developer';
 
 class AudioPlayScreen extends StatefulWidget {
   final String title;
   final String author;
   final String coverImageUrl;
-  final String audioUrl;
+  final List<String> audioUrls;
 
   const AudioPlayScreen({
     super.key,
     required this.title,
     required this.author,
     required this.coverImageUrl,
-    required this.audioUrl,
+    required this.audioUrls,
   });
 
   @override
@@ -28,6 +25,7 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   Duration _current = Duration.zero;
   Duration _total = Duration.zero;
   bool _isPlaying = false;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -38,7 +36,11 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
 
   Future<void> _setupAudio() async {
     try {
-      await _player.setUrl(CloudinaryConfig.baseUrl(widget.audioUrl, MediaType.audio));
+      final playlist = ConcatenatingAudioSource(
+        children: widget.audioUrls.map((url) => AudioSource.uri(Uri.parse(url))).toList(),
+      );
+
+      await _player.setAudioSource(playlist);
 
       _player.durationStream.listen((duration) {
         setState(() {
@@ -53,6 +55,12 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       _player.playerStateStream.listen((state) {
         setState(() => _isPlaying = state.playing);
       });
+
+      _player.currentIndexStream.listen((index) {
+        setState(() {
+          if (index != null) _currentIndex = index;
+        });
+      });
     } catch (e) {
       log('Audio load error: $e');
     }
@@ -65,105 +73,154 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   }
 
   void _togglePlayback() {
-    if (_isPlaying) {
-      _player.pause();
-    } else {
-      _player.play();
-    }
+    _isPlaying ? _player.pause() : _player.play();
   }
 
   String _formatTime(Duration duration) {
-    final minutes = duration.inMinutes.toString().padLeft(2, '0');
+    final minutes = duration.inMinutes.toString().padLeft(1, '0');
     final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
+  }
+
+  void _playAtIndex(int index) {
+    _player.seek(Duration.zero, index: index);
+    _player.play();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlue[50],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(widget.title, style: const TextStyle(color: Colors.black)),
-        iconTheme: const IconThemeData(color: Colors.black),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(
-                widget.coverImageUrl,
-                height: 300,
-                width: double.infinity,
-                fit: BoxFit.cover,
+      backgroundColor: const Color(0xFF0F1B14),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              // Cover Image & Info
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.network(
+                  widget.coverImageUrl,
+                  height: 250,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              widget.title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              widget.author,
-              style: const TextStyle(fontSize: 18, color: Colors.black54),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(_formatTime(_current)),
-                Text(_formatTime(_total)),
-              ],
-            ),
-            Slider(
-              value: _current.inSeconds.toDouble().clamp(0, _total.inSeconds.toDouble()),
-              max: _total.inSeconds.toDouble().clamp(1, double.infinity),
-              onChanged: (value) => _player.seek(Duration(seconds: value.toInt())),
-              activeColor: Colors.teal,
-              inactiveColor: Colors.grey[300],
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.fast_rewind, size: 32),
-                  onPressed: () {
-                    final newPosition = _current - const Duration(seconds: 10);
-                    _player.seek(newPosition > Duration.zero ? newPosition : Duration.zero);
-                  },
+              const SizedBox(height: 24),
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
                 ),
-                const SizedBox(width: 20),
-                CircleAvatar(
-                  radius: 36,
-                  backgroundColor: Colors.teal,
-                  child: IconButton(
-                    icon: Icon(
-                      _isPlaying ? Icons.pause : Icons.play_arrow,
-                      size: 36,
-                      color: Colors.white,
-                    ),
-                    onPressed: _togglePlayback,
+              ),
+              Text(
+                widget.author,
+                style: const TextStyle(fontSize: 18, color: Colors.greenAccent),
+              ),
+              const SizedBox(height: 20),
+
+              // Slider
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(_formatTime(_current), style: const TextStyle(color: Colors.white70)),
+                  Text(_formatTime(_total), style: const TextStyle(color: Colors.white70)),
+                ],
+              ),
+              Slider(
+                value: _current.inSeconds.toDouble().clamp(0, _total.inSeconds.toDouble()),
+                max: _total.inSeconds.toDouble().clamp(1, double.infinity),
+                onChanged: (value) => _player.seek(Duration(seconds: value.toInt())),
+                activeColor: Colors.greenAccent,
+                inactiveColor: Colors.white12,
+              ),
+              const SizedBox(height: 24),
+
+              // Playback Controls
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.skip_previous, size: 32, color: Colors.greenAccent),
+                    onPressed: () => _player.seekToPrevious(),
                   ),
+                  IconButton(
+                    icon: const Icon(Icons.replay_10, size: 32, color: Colors.greenAccent),
+                    onPressed: () {
+                      final newPosition = _current - const Duration(seconds: 10);
+                      _player.seek(newPosition > Duration.zero ? newPosition : Duration.zero);
+                    },
+                  ),
+                  const SizedBox(width: 16),
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundColor: Colors.greenAccent,
+                    child: IconButton(
+                      icon: Icon(
+                        _isPlaying ? Icons.pause : Icons.play_arrow,
+                        size: 32,
+                        color: Colors.black,
+                      ),
+                      onPressed: _togglePlayback,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.forward_10, size: 32, color: Colors.greenAccent),
+                    onPressed: () {
+                      final newPosition = _current + const Duration(seconds: 10);
+                      if (_total != Duration.zero && newPosition < _total) {
+                        _player.seek(newPosition);
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.skip_next, size: 32, color: Colors.greenAccent),
+                    onPressed: () => _player.seekToNext(),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 24),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Up Next',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
-                const SizedBox(width: 20),
-                IconButton(
-                  icon: const Icon(Icons.fast_forward, size: 32),
-                  onPressed: () {
-                    final newPosition = _current + const Duration(seconds: 10);
-                    if (_total != Duration.zero && newPosition < _total) {
-                      _player.seek(newPosition);
-                    }
+              ),
+              const SizedBox(height: 8),
+
+              // Up Next List
+              Expanded(
+                child: ListView.builder(
+                  itemCount: widget.audioUrls.length,
+                  itemBuilder: (context, index) {
+                    final isSelected = index == _currentIndex;
+                    final audioName = widget.audioUrls[index].split('/').last;
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 6),
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(widget.coverImageUrl, width: 50, height: 50, fit: BoxFit.cover),
+                      ),
+                      title: Text(
+                        audioName,
+                        style: TextStyle(
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          color: isSelected ? Colors.white : Colors.white70,
+                        ),
+                      ),
+                      subtitle: Text(widget.author, style: const TextStyle(color: Colors.greenAccent)),
+                      onTap: () => _playAtIndex(index),
+                    );
                   },
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

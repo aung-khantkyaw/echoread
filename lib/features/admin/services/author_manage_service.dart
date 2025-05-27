@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../../core/config/cloudinary_file_upload.dart';
+import '../../../core/utils/cloudinary_file_upload.dart';
 
 class AuthorManageService{
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -65,18 +65,6 @@ class AuthorManageService{
     } catch (e, stackTrace) {
       log('Error in createAuthor: $e', stackTrace: stackTrace);
       rethrow;
-    }
-  }
-
-  Future<void> updateAuthor(String authorId, String authorName) async {
-    try {
-      await _firestore.collection('authors').doc(authorId).update({
-        'author_name': authorName,
-        'updated_at': FieldValue.serverTimestamp(),
-      });
-      log('Author "$authorId" updated to "$authorName"');
-    } catch (e) {
-      log('Failed to update author: $e');
     }
   }
 
