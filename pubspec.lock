@@ -137,6 +137,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.0"
+  cloudinary_public:
+    dependency: "direct main"
+    description:
+      name: cloudinary_public
+      sha256: "30c2aac5a31b468e5e955d2bbbac3eebcd1c66c9c7c2ffd75828606503bdda68"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.23.1"
   cloudinary_url_gen:
     dependency: "direct main"
     description:
@@ -209,6 +217,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.2"
+  dio:
+    dependency: transitive
+    description:
+      name: dio
+      sha256: "253a18bbd4851fecba42f7343a1df3a9a4c1d31a2c1b37e221086b4fa8c8dbc9"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.8.0+1"
+  dio_web_adapter:
+    dependency: transitive
+    description:
+      name: dio_web_adapter
+      sha256: "7586e476d70caecaf1686d21eee7247ea43ef5c345eab9e0cc3583ff13378d78"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.1"
   drop_down_list:
     dependency: "direct main"
     description:
@@ -241,6 +265,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
+  ffmpeg_kit_flutter:
+    dependency: "direct main"
+    description:
+      name: ffmpeg_kit_flutter
+      sha256: "843aae41823ca94a0988d975b4b6cdc6948744b9b7e2707d81a3a9cd237b0100"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.3"
+  ffmpeg_kit_flutter_full:
+    dependency: "direct main"
+    description:
+      name: ffmpeg_kit_flutter_full
+      sha256: c845c1bcf40a8869eab9e401526c6cf3fc8091d04c0a7ec9a0af854d6c7e354a
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.3"
+  ffmpeg_kit_flutter_platform_interface:
+    dependency: transitive
+    description:
+      name: ffmpeg_kit_flutter_platform_interface
+      sha256: addf046ae44e190ad0101b2fde2ad909a3cd08a2a109f6106d2f7048b7abedee
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.2.1"
   file:
     dependency: transitive
     description:
@@ -438,7 +486,7 @@ packages:
     source: hosted
     version: "1.4.0"
   http_parser:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http_parser
       sha256: "178d74305e7866013777bab2c3d8726205dc5a4dd935297175b19a23a2e66571"
@@ -518,7 +566,7 @@ packages:
     source: hosted
     version: "0.2.1+1"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf
@@ -638,7 +686,7 @@ packages:
     source: hosted
     version: "1.9.1"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: "50c5dd5b6e1aaf6fb3a78b33f6aa3afca52bf903a8a5298f53101fdaee55bbcd"
@@ -918,18 +966,18 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "69fa2cccda6013770273fb726d03528c35d6ced00a28a7b21fae8c7d5c756a73"
+      sha256: "6898c5dc81f73ac4e1156a075e4dd4591ea8927f26dcc77f6ba0e9b1b1d6c8c5"
       url: "https://pub.dev"
     source: hosted
-    version: "29.2.5"
+    version: "29.2.7"
   syncfusion_flutter_pdf:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: syncfusion_flutter_pdf
-      sha256: d6035c31119ae608aa12f367bff60f5b7a84e573daebff1dee26a064c7e56384
+      sha256: c9cfd8fc0cdda032bd68d35520626537a77d2884c283887e1595c4c0cdc98c64
       url: "https://pub.dev"
     source: hosted
-    version: "29.2.5"
+    version: "29.2.7"
   syncfusion_flutter_pdfviewer:
     dependency: "direct main"
     description:

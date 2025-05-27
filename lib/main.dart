@@ -82,7 +82,7 @@ class _EchoReadAppState extends State<EchoReadApp> {
     }
 
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: textScaleFactor),
+      data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(textScaleFactor)),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'EchoRead',
@@ -103,11 +103,7 @@ class _EchoReadAppState extends State<EchoReadApp> {
       ),
     );
   }
-
-
-
 }
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

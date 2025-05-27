@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/config/cloudinary_config.dart';
@@ -7,8 +5,6 @@ import 'package:echoread/core/config/cloudinary_config.dart';
 import 'package:echoread/l10n/app_localizations.dart';
 
 import 'book_add_page.dart';
-
-import 'package:echoread/features/library/presentation/widgets/pdf_view_page.dart';
 
 class BookManage extends StatefulWidget {
   final List<Map<String, dynamic>> booksList;
@@ -37,7 +33,7 @@ class _BookManageState extends State<BookManage> {
 
   @override
   Widget build(BuildContext context) {
-    log(widget.booksList.toString());
+    // log(widget.booksList.toString());
     final locale = AppLocalizations.of(context)!;
 
     return Column(
@@ -89,16 +85,16 @@ class _BookManageState extends State<BookManage> {
                         style: const TextStyle(fontSize: 14),
                       ),
                       const SizedBox(height: 8),
-                      TextButton(
-                        onPressed: () => {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PdfViewScreen(publicId: book['ebook_url'], title: book['book_name'],),
-                            ),
-                          )},
-                        child: const Text("Go"),
-                      ),
+                      // TextButton(
+                      //   onPressed: () => {
+                      //     Navigator.push(
+                      //       context,
+                      //       MaterialPageRoute(
+                      //         builder: (context) => PdfViewScreen(publicId: book['ebook_url'], title: book['book_name'],),
+                      //       ),
+                      //     )},
+                      //   child: const Text("Go"),
+                      // ),
                       Text('Ebook URL: ${book['ebook_url'] ?? 'N/A'}'),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

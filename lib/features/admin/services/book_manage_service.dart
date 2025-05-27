@@ -2,7 +2,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:echoread/core/config/cloudinary_file_upload.dart';
+
+import 'package:echoread/core/utils/cloudinary_file_upload.dart';
+
+import '../../../core/utils/func.dart';
 
 class BookManageService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -42,6 +45,7 @@ class BookManageService {
     }
   }
 
+
   Future<void> createBook({
     required File bookImage,
     required File ebookFile,
@@ -50,41 +54,85 @@ class BookManageService {
     required String bookDescription,
     required String authorId,
   }) async {
+    log('Create Book - START');
+
     try {
       final cloudinaryUploader = CloudinaryFileUpload();
 
+      // Upload book image
+      log('Uploading book image');
       final bookImgPath = await cloudinaryUploader.uploadImageToCloudinary(bookImage, 'book_cover');
 
-      final ebookPath = await cloudinaryUploader.uploadPdfToCloudinary(ebookFile, 'ebooks');
+      if (bookImgPath == null) throw Exception('Book image upload failed.');
 
+      // Upload eBook
+      final List<String> ebookPaths = [];
+      final ebookSize = ebookFile.lengthSync();
+
+      if (ebookSize > 10 * 1024 * 1024) {
+        log('eBook is too large, splitting by pages...');
+
+        final chunks = await splitPdfByPage(ebookFile, 10); // Each chunk ~10 pages
+
+        for (final chunk in chunks) {
+          final path = await cloudinaryUploader.uploadPdfToCloudinary(chunk, 'ebooks');
+          if (path == null) throw Exception('Failed to upload ebook chunk');
+          ebookPaths.add(path);
+          chunk.deleteSync(); // cleanup
+        }
+      } else {
+        final path = await cloudinaryUploader.uploadPdfToCloudinary(ebookFile, 'ebooks');
+        if (path == null) throw Exception('eBook upload failed');
+        ebookPaths.add(path);
+      }
+
+      // Upload audio files
       final List<String> audioPaths = [];
+
+      log('Uploading ${audioFiles.length} audio file(s)');
       for (final audioFile in audioFiles) {
-        final audioPath =
-        await cloudinaryUploader.uploadAudioToCloudinary(
-            audioFile, 'book_audio');
-        if (audioPath == null) throw Exception('Audio upload failed');
-        audioPaths.add(audioPath);
+        final sizeInMB = audioFile.lengthSync() / (1024 * 1024);
+
+        List<File> audioChunks = [];
+
+        if (sizeInMB > 100) {
+          log('Audio file too big (${sizeInMB.toStringAsFixed(2)} MB), splitting...');
+          audioChunks = await splitAudioByDuration(audioFile, 600); // every 10 mins
+        } else {
+          audioChunks = [audioFile];
+        }
+
+        for (final chunk in audioChunks) {
+          final path = await cloudinaryUploader.uploadAudioToCloudinary(chunk, 'book_audio');
+          if (path == null) throw Exception('Audio upload failed');
+          audioPaths.add(path);
+          chunk.deleteSync(); // Clean up chunk files
+        }
       }
 
-      if (bookImgPath == null || ebookPath == null || audioPaths.isEmpty) {
-        throw Exception('One or more uploads failed');
+      if (audioPaths.isEmpty || ebookPaths.isEmpty) {
+        throw Exception('Upload returned empty paths');
       }
 
+      // Save to Firestore
       final bookData = {
         'book_name': bookName,
         'book_description': bookDescription,
-        'ebook_url': ebookPath,
+        'ebook_urls': ebookPaths,
         'audio_urls': audioPaths,
         'book_img': bookImgPath,
         'author_id': authorId,
         'created_at': FieldValue.serverTimestamp(),
       };
 
-      log('Creating book: $bookData');
+      log('Creating book in Firestore: $bookData');
       await _firestore.collection('books').add(bookData);
+
+      log('Book creation successful');
     } catch (e, stackTrace) {
       log('Error in createBook: $e', stackTrace: stackTrace);
       rethrow;
     }
   }
+
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:echoread/l10n/app_localizations.dart';
 
+import '../../../../core/config/cloudinary_config.dart';
+
 class ExplorerScreen extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;
 
@@ -92,7 +94,12 @@ class _ExplorerScreenState extends State<ExplorerScreen> {
                         leading: CircleAvatar(
                           radius: 28,
                           backgroundColor: Colors.blueGrey[100],
-                          child: const Icon(Icons.person, color: Colors.black54),
+                          backgroundImage: (author['profile_img'] != null && author['profile_img'].toString().isNotEmpty)
+                              ? NetworkImage(CloudinaryConfig.baseUrl(author['profile_img'], MediaType.image))
+                              : null,
+                          child: (author['profile_img'] == null || author['profile_img'].toString().isEmpty)
+                              ? const Icon(Icons.person, color: Colors.black54)
+                              : null,
                         ),
                         title: Text(
                           author['name'] ?? locale.unknown_author,

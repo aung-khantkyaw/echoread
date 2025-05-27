@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+
+import 'package:echoread/core/widgets/app_bar.dart';
 import 'package:echoread/core/widgets/build_image_picker.dart';
 import 'package:echoread/core/widgets/show_snack_bar.dart';
 import 'package:echoread/core/utils/media_picker_helper.dart';
 import 'package:echoread/features/admin/services/author_manage_service.dart';
+
+import 'package:echoread/l10n/app_localizations.dart';
 
 class AuthorAddPage extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;
@@ -17,9 +21,6 @@ class AuthorAddPage extends StatefulWidget {
 class _AuthorAddPageState extends State<AuthorAddPage> {
   final _formKey = GlobalKey<FormState>();
 
-  late List<Map<String, dynamic>> _authors;
-  late List<Map<String, dynamic>> _allAuthors;
-
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
 
@@ -31,9 +32,6 @@ class _AuthorAddPageState extends State<AuthorAddPage> {
   @override
   void initState() {
     super.initState();
-    _allAuthors = List<Map<String, dynamic>>.from(widget.authorsList);
-    _authors = List<Map<String, dynamic>>.from(widget.authorsList);
-    _searchController.addListener(_filterAuthors);
   }
 
   @override
@@ -41,17 +39,6 @@ class _AuthorAddPageState extends State<AuthorAddPage> {
     _nameController.dispose();
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _filterAuthors() {
-    final query = _searchController.text.toLowerCase();
-    setState(() {
-      _authors = _allAuthors
-          .where((author) =>
-      author['name'] != null &&
-          author['name'].toString().toLowerCase().contains(query))
-          .toList();
-    });
   }
 
   Future<void> _pickImage() async {
@@ -68,7 +55,9 @@ class _AuthorAddPageState extends State<AuthorAddPage> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate() && _pickedImage != null) {
+
       setState(() => _isLoading = true);
+
       try {
         await _authorService.createAuthor(
           authorProfile: _pickedImage!,
@@ -95,8 +84,13 @@ class _AuthorAddPageState extends State<AuthorAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    final locale = AppLocalizations.of(context)!;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Authors')),
+      appBar: commonAppBar(
+        context: context,
+        title: locale.add_author
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -108,12 +102,14 @@ class _AuthorAddPageState extends State<AuthorAddPage> {
                   buildImagePicker(
                     filePath: _pickedImage,
                     onPressed: _pickImage,
+                    placeholderText: locale.select_image_hint,
+                    height: 320
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Author Name',
+                    decoration: InputDecoration(
+                      labelText: locale.author_name,
                       border: OutlineInputBorder(),
                     ),
                     validator: (value) => value == null || value.trim().isEmpty ? 'Please enter author name' : null,
@@ -123,9 +119,21 @@ class _AuthorAddPageState extends State<AuthorAddPage> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _submitForm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF8C2D),
+                        foregroundColor: const Color(0xFF4B1E0A),
+                        minimumSize: const Size.fromHeight(45),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'AncizarSerifBold',
+                        ),
+                      ),
                       child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text('Add Author'),
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(locale.add_author),  
                     ),
                   ),
                 ],
