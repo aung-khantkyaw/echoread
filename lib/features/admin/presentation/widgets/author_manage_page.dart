@@ -69,6 +69,18 @@ class _AuthorManageState extends State<AuthorManage> {
               children: [
                 ElevatedButton(
                   onPressed: _goToAddAuthor,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF8C2D),
+                    foregroundColor: const Color(0xFF4B1E0A),
+                    minimumSize: const Size.fromHeight(45),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'AncizarSerifBold',
+                    ),
+                  ),
                   child: Text(locale.add_author),
                 ),
                 const SizedBox(height: 12),

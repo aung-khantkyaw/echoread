@@ -1,16 +1,19 @@
-import 'dart:developer';
-
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:echoread/core/widgets/custom_gif_loading.dart';
+import 'package:echoread/core/widgets/show_snack_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-import 'package:echoread/core/widgets/custom_gif_loading.dart';
-
 class PdfMergedViewScreen extends StatefulWidget {
-  final List<String> parts; // URLs of splitted PDFs
+  final List<String> parts;
   final String title;
 
   const PdfMergedViewScreen({
@@ -23,36 +26,141 @@ class PdfMergedViewScreen extends StatefulWidget {
   State<PdfMergedViewScreen> createState() => _PdfMergedViewScreenState();
 }
 
-class _PdfMergedViewScreenState extends State<PdfMergedViewScreen> {
+class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
+    with WidgetsBindingObserver {
   Uint8List? mergedPdfBytes;
   bool isLoading = true;
   String? error;
+  String? readingStatusDocId;
+  final PdfViewerController _pdfViewerController = PdfViewerController();
+  int? _totalPages;
+  int _readingDurationInMinutes = 0; // This will hold the total pages as minutes
+  int _remainingMinutes = 0; // This will decrement
+  Timer? _timer;
+  DateTime? _startTime;
+  bool isMarkedComplete = false;
+  bool _isOnLastPage = false;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    mergeChunks();
+    WidgetsBinding.instance.addObserver(this);
+    initialize();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused) {
+      _timer?.cancel(); // Pause the timer
+      log('Timer paused');
+    } else if (state == AppLifecycleState.resumed && _remainingMinutes > 0) {
+      startTimer(); // Resume the timer if there's time left
+      log('Timer resumed');
+    }
+  }
+
+  Future<void> initialize() async {
+    if (!await hasInternetConnection()) {
+      setState(() {
+        error = "No internet connection.";
+        isLoading = false;
+      });
+      return;
+    }
+
+    await mergeChunks(); // Merge chunks first to get the PDF bytes
+
+    // The _totalPages will be set in onDocumentLoaded callback
+    // We'll then call createReadingStatus and other init logic there.
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<bool> hasInternetConnection() async {
+    var connectivityResults = await Connectivity().checkConnectivity();
+    return connectivityResults.isNotEmpty &&
+        !connectivityResults.contains(ConnectivityResult.none);
+  }
+
+  Future<void> createReadingStatus({required int totalPages}) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    try {
+      final query = await _firestore
+          .collection('reading_status')
+          .where('userId', isEqualTo: user.uid)
+          .where('bookId', isEqualTo: widget.title)
+          .where('isComplete', isEqualTo: false)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        readingStatusDocId = query.docs.first.id;
+        final data = query.docs.first.data();
+        _remainingMinutes = data['remainingMinutes'] ?? 0;
+        log("Existing reading_status found. Remaining minutes: $_remainingMinutes");
+      } else {
+        // Only set _remainingMinutes to totalPages if it's a new entry
+        _remainingMinutes = totalPages;
+        final docRef = await _firestore.collection('reading_status').add({
+          'userId': user.uid,
+          'bookId': widget.title,
+          'startDate': Timestamp.now(),
+          'isComplete': false,
+          'lastReadPage': 1,
+          'remainingMinutes': _remainingMinutes, // Use the totalPages here
+        });
+        readingStatusDocId = docRef.id;
+        log("New reading_status created. Initial remaining minutes: $_remainingMinutes");
+        showSnackBar(context, "Start read ${widget.title}",
+            type: SnackBarType.success);
+      }
+    } catch (e) {
+      log('Error creating reading status: $e');
+    }
+  }
+
+  Future<int?> getLastReadPage() async {
+    if (readingStatusDocId == null) return null;
+
+    try {
+      final doc =
+      await _firestore.collection('reading_status').doc(readingStatusDocId).get();
+      final data = doc.data();
+      if (data != null && data.containsKey('lastReadPage')) {
+        return data['lastReadPage'];
+      }
+    } catch (e) {
+      log('Failed to get last read page: $e');
+    }
+    return null;
   }
 
   Future<void> mergeChunks() async {
-    log(widget.parts.toString());
-    final apiUrl = "https://pdf-merge-api.onrender.com/merge-pdfs";
+    const apiUrl = "https://echo-read-media-split-merge.onrender.com/api/pdf/merge";
 
-    // final apiUrl = "https://echo-read-media-split-merge.onrender.com/api/pdf/merge";
+    if (widget.parts.isEmpty) {
+      setState(() {
+        error = "No PDF parts provided";
+        isLoading = false;
+      });
+      return;
+    }
+
     try {
       if (widget.parts.length == 1) {
-        // Just load the single PDF directly
         final response = await http.get(Uri.parse(widget.parts.first));
         if (response.statusCode == 200) {
-          setState(() {
-            mergedPdfBytes = response.bodyBytes;
-            isLoading = false;
-          });
+          mergedPdfBytes = response.bodyBytes;
         } else {
-          setState(() {
-            error = "Failed to load single PDF: ${response.statusCode}";
-            isLoading = false;
-          });
+          error = "Failed to load single PDF: ${response.statusCode}";
         }
       } else {
         final response = await http.post(
@@ -62,29 +170,119 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen> {
         );
 
         if (response.statusCode == 200) {
-          setState(() {
-            mergedPdfBytes = response.bodyBytes;
-            isLoading = false;
-          });
+          mergedPdfBytes = response.bodyBytes;
         } else {
-          setState(() {
-            error = "Merge failed (${response.statusCode}): ${utf8.decode(response.bodyBytes)}";
-            isLoading = false;
-          });
+          error = "Merge failed (${response.statusCode})";
         }
       }
     } catch (e) {
-      setState(() {
-        error = "Error: $e";
-        isLoading = false;
+      error = "Error: $e";
+    }
+  }
+
+  void startTimer() {
+    _startTime = DateTime.now();
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (_remainingMinutes > 0) {
+        _remainingMinutes--;
+        updateRemainingTime(_remainingMinutes);
+        setState(() {}); // update UI for remainingMinutes changes
+
+        if (_remainingMinutes <= 0 && _isOnLastPage && !isMarkedComplete) {
+          // You might want to automatically prompt or show "Mark as Complete" button here
+        }
+      } else {
+        _timer?.cancel();
+      }
+    });
+  }
+
+  void startBottomCheckTimer() {
+    _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      if (_pdfViewerController.pageNumber == _totalPages) {
+        setState(() {
+          _isOnLastPage = true;
+        });
+      } else {
+        setState(() {
+          _isOnLastPage = false;
+        });
+      }
+    });
+  }
+
+  Future<void> updateRemainingTime(int minutes) async {
+    if (readingStatusDocId == null) return;
+    try {
+      await _firestore.collection('reading_status').doc(readingStatusDocId).update({
+        'remainingMinutes': minutes,
       });
+    } catch (e) {
+      log('Failed to update remaining time: $e');
+    }
+  }
+
+  Future<void> updateLastReadPage(int pageNumber) async {
+    if (readingStatusDocId == null) return;
+    try {
+      await _firestore.collection('reading_status').doc(readingStatusDocId).update({
+        'lastReadPage': pageNumber,
+      });
+      log("Updated last read page to $pageNumber");
+    } catch (e) {
+      log('Failed to update last read page: $e');
+    }
+  }
+
+  Future<void> markAsComplete() async {
+    if (readingStatusDocId == null || isMarkedComplete) return;
+    try {
+      await _firestore.collection('reading_status').doc(readingStatusDocId).update({
+        'isComplete': true,
+        'endDate': Timestamp.now(),
+        'remainingMinutes': 0,
+      });
+      isMarkedComplete = true;
+      showSnackBar(context, "Marked as complete!", type: SnackBarType.success);
+    } catch (e) {
+      log('Failed to update reading status: $e');
+      showSnackBar(context, "Error: $e", type: SnackBarType.error);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return const GifLoader();
+    final bool showCompleteButton = _remainingMinutes <= 0 &&
+        _totalPages != null &&
+        _isOnLastPage &&
+        !isMarkedComplete;
+
+    if (isLoading) return const GifLoader();
+
+    if (error != null) {
+      return Scaffold(
+        appBar: AppBar(title: Text(widget.title), centerTitle: true),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(error!, textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isLoading = true;
+                    error = null;
+                  });
+                  initialize();
+                },
+                child: const Text("Retry"),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     return Scaffold(
@@ -92,9 +290,59 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen> {
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: error != null
-          ? Center(child: Text(error!))
-          : SfPdfViewer.memory(mergedPdfBytes!),
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: SfPdfViewer.memory(
+              mergedPdfBytes!,
+              controller: _pdfViewerController,
+              onDocumentLoaded: (details) async {
+                _totalPages = details.document.pages.count;
+                _readingDurationInMinutes = _totalPages!;
+                log("Total pages: $_totalPages");
+
+                await createReadingStatus(totalPages: _totalPages!);
+
+                int? lastReadPage = await getLastReadPage();
+                if (lastReadPage != null && lastReadPage > 0) {
+                  _pdfViewerController.jumpToPage(lastReadPage);
+                }
+
+                if (_remainingMinutes > 0) {
+                  startTimer();
+                }
+
+                startBottomCheckTimer();
+              },
+              onPageChanged: (details) {
+                updateLastReadPage(details.newPageNumber);
+              },
+            ),
+          ),
+          // Button appear at bottom
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            bottom: _isOnLastPage && showCompleteButton ? 20 : -60,
+            left: 20,
+            right: 20,
+            child: AnimatedOpacity(
+              opacity: _isOnLastPage && showCompleteButton ? 1.0 : 0.0,
+              duration: const Duration(milliseconds: 300),
+              child: ElevatedButton(
+                onPressed: markAsComplete,
+                child: const Text("Mark as Complete"),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _timer?.cancel();
+    super.dispose();
   }
 }
