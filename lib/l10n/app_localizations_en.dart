@@ -78,6 +78,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get delete_author => 'Are you sure you want to delete this author?';
 
   @override
+  String get delete_book => 'Delete Book';
+
+  @override
+  String get delete_book_confirm => 'Are you sure you want to delete this book?';
+
+  @override
   String get downloads => 'Downloads';
 
   @override
@@ -123,6 +129,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get no_books => 'No books';
 
   @override
+  String get no_books_found => 'No books found';
+
+  @override
   String get no_file_selected => 'No file selected';
 
   @override
@@ -139,6 +148,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get search_authors_hint => 'Search for authors';
+
+  @override
+  String get search_books_hint => 'Search for books';
 
   @override
   String get select_author => 'Select Author';

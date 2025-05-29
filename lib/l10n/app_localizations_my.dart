@@ -78,6 +78,12 @@ class AppLocalizationsMy extends AppLocalizations {
   String get delete_author => 'စာရေးသူကိုဖျက်ရန်သေချာပါသလား?';
 
   @override
+  String get delete_book => 'စာအုပ်ကို ဖျက်မည်';
+
+  @override
+  String get delete_book_confirm => 'စာအုပ်ကိုဖျက်ရန်သေချာပါသလား?';
+
+  @override
   String get downloads => 'ဒေါင်းလုပ်များ';
 
   @override
@@ -123,6 +129,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get no_books => 'စာအုပ် မရှိပါ';
 
   @override
+  String get no_books_found => 'စာအုပ်များ မတွေ့ရှိပါ';
+
+  @override
   String get no_file_selected => 'ဖိုင်မရွေးချယ်ရသေးပါ';
 
   @override
@@ -139,6 +148,9 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get search_authors_hint => 'စာရေးဆရာများကို ရှာဖွေပါ';
+
+  @override
+  String get search_books_hint => 'စာအုပ်များကို ရှာဖွေပါ';
 
   @override
   String get select_author => 'စာရေးဆရာ‌ရွေးပါ';

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -6,6 +7,8 @@ import 'package:flutter/foundation.dart';
 
 import 'package:echoread/core/utils/cloudinary_file_upload.dart';
 import 'package:echoread/core/utils/func.dart';
+
+import '../../../core/utils/cloudinary_file_delete.dart';
 
 class BookManageService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -137,5 +140,20 @@ class BookManageService {
       log('Error in createBook: $e', stackTrace: stackTrace);
       rethrow;
     }
+  }
+
+  Future<void> deleteBook(String bookId) async {
+    try {
+      await FirebaseFirestore.instance.collection('books').doc(bookId).delete();
+      print('Book $bookId deleted successfully');
+    } catch (e) {
+      print('Error deleting book: $e');
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getBookById(int bookId) async {
+    // Implement your DB or API call here to get book by ID
+    // Return map containing book data including audio_urls and ebook_urls
   }
 }

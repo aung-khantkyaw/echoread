@@ -233,6 +233,18 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to delete this author?'**
   String get delete_author;
 
+  /// No description provided for @delete_book.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Book'**
+  String get delete_book;
+
+  /// No description provided for @delete_book_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this book?'**
+  String get delete_book_confirm;
+
   /// No description provided for @downloads.
   ///
   /// In en, this message translates to:
@@ -323,6 +335,12 @@ abstract class AppLocalizations {
   /// **'No books'**
   String get no_books;
 
+  /// No description provided for @no_books_found.
+  ///
+  /// In en, this message translates to:
+  /// **'No books found'**
+  String get no_books_found;
+
   /// No description provided for @no_file_selected.
   ///
   /// In en, this message translates to:
@@ -358,6 +376,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search for authors'**
   String get search_authors_hint;
+
+  /// No description provided for @search_books_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for books'**
+  String get search_books_hint;
 
   /// No description provided for @select_author.
   ///

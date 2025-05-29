@@ -55,7 +55,7 @@ Future<List<String>> splitPdfByPage(File pdfFile, int pagesPerChunk) async {
       await http.MultipartFile.fromPath(
         'pdf',
         pdfFile.path,
-        filename: path.basename(pdfFile.path), // original filename
+        filename: path.basename(pdfFile.path),
       ),
     );
 
@@ -65,7 +65,6 @@ Future<List<String>> splitPdfByPage(File pdfFile, int pagesPerChunk) async {
     final respStr = await response.stream.bytesToString();
     final data = jsonDecode(respStr);
 
-    // ✅ Fix: safely extract the list from the 'files' key
     final files = data['files'];
     if (files is List) {
       return List<String>.from(files);

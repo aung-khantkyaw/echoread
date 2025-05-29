@@ -1,46 +1,81 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:echoread/core/config/cloudinary_config.dart';
-
 import 'package:echoread/features/library/presentation/widgets/audio_player_page.dart';
 import 'package:echoread/features/library/presentation/widgets/pdf_view_page.dart';
-
+import 'package:echoread/core/widgets/show_snack_bar.dart';
 import 'package:echoread/features/library/services/book_service.dart';
 
-class BookDetailsScreen extends StatelessWidget {
+class BookDetailsScreen extends StatefulWidget {
   final String bookId;
 
   const BookDetailsScreen({super.key, required this.bookId});
 
-  Future<Map<String, dynamic>?> fetchBookDetail() async {
-    final bookService = BookService();
-    return await bookService.getBookDetail(bookId);
+  @override
+  State<BookDetailsScreen> createState() => _BookDetailsScreenState();
+}
+
+class _BookDetailsScreenState extends State<BookDetailsScreen> {
+  final BookService _bookService = BookService();
+  late Future<Map<String, dynamic>?> _bookDetailFuture;
+  bool _isBookSaved = false;
+  User? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentUser = FirebaseAuth.instance.currentUser;
+    _bookDetailFuture = _bookService.getBookDetail(widget.bookId);
+    _checkIfBookIsSaved();
+    log(_isBookSaved.toString());
   }
+
+  Future<void> _checkIfBookIsSaved() async {
+    if (_currentUser == null) return;
+
+    try {
+      final isSaved = await _bookService.isBookSavedByUser(_currentUser!.uid, widget.bookId);
+      setState(() {
+        _isBookSaved = isSaved;
+        log(_isBookSaved.toString());
+      });
+      log(_isBookSaved.toString());
+    } catch (e) {
+      debugPrint("Error checking if book is saved: $e");
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, dynamic>?>(
-      future: fetchBookDetail(),
+      future: _bookDetailFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
         }
 
-        if (snapshot.hasError || snapshot.data == null) {
-          return const Center(child: Text('Failed to load book details.'));
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const Scaffold(
+            body: Center(child: Text('Failed to load book details.')),
+          );
         }
 
         final book = snapshot.data!;
         final author = book['author'] ?? {};
         final cover = book['book_img'] as String?;
-        final imageUrl = (cover != null && cover.isNotEmpty)
-            ? CloudinaryConfig.baseUrl(cover, MediaType.image)
+        final imageUrl = (cover?.isNotEmpty ?? false)
+            ? CloudinaryConfig.baseUrl(cover!, MediaType.image)
             : null;
 
         return Scaffold(
-            backgroundColor: const Color(0xFFFFF4ED),
-        body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+          backgroundColor: const Color(0xFFFFF4ED),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -54,17 +89,10 @@ class BookDetailsScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           color: Colors.grey[200],
                           image: imageUrl != null
-                              ? DecorationImage(
-                            image: NetworkImage(imageUrl),
-                            fit: BoxFit.cover,
-                          )
+                              ? DecorationImage(image: NetworkImage(imageUrl), fit: BoxFit.cover)
                               : null,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 3)),
                           ],
                         ),
                         child: imageUrl == null
@@ -86,107 +114,127 @@ class BookDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 30),
-                const Text(
-                  "What's it about?",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                const Text("What's it about?", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 10),
+                Text(book['book_description'] ?? 'No description available.',
+                    style: const TextStyle(fontSize: 16, height: 1.5)),
+                const SizedBox(height: 30),
+
+                // --- Ebook Button ---
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.picture_as_pdf),
+                  label: const Text("Read Ebook"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF8C2D),
+                    foregroundColor: const Color(0xFF4B1E0A),
+                    minimumSize: const Size.fromHeight(45),
+                  ),
+                  onPressed: () {
+                    final parts = book['ebook_urls'];
+                    if (parts is List && parts.every((e) => e is String)) {
+                      final urls = parts.cast<String>().map(
+                            (id) => CloudinaryConfig.baseUrl(id, MediaType.ebook),
+                      ).toList();
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PdfMergedViewScreen(
+                            parts: urls,
+                            title: book['book_name'] ?? 'Ebook',
+                          ),
+                        ),
+                      );
+                    } else {
+                      showSnackBar(context, 'Invalid ebook parts list', type: SnackBarType.error);
+                    }
+                  },
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  book['book_description'] ?? 'No description available.',
-                  style: const TextStyle(fontSize: 16, height: 1.5),
-                ),
-                const SizedBox(height: 30),
-                Column(
-                  children: [
-                    ElevatedButton.icon(
-                        icon: const Icon(Icons.picture_as_pdf),
-                        label: const Text("Read Ebook"),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF8C2D),
-                          foregroundColor: const Color(0xFF4B1E0A),
-                          minimumSize: const Size.fromHeight(45),
+
+                // --- Audio Button ---
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.audiotrack),
+                  label: const Text("Play Audio"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFA44D),
+                    foregroundColor: const Color(0xFF4B1E0A),
+                    minimumSize: const Size.fromHeight(45),
+                  ),
+                  onPressed: () {
+                    final audioParts = book['audio_urls'];
+                    if (audioParts is List && audioParts.every((e) => e is String)) {
+                      final urls = audioParts.cast<String>().map(
+                            (id) => CloudinaryConfig.baseUrl(id, MediaType.audio),
+                      ).toList();
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AudioPlayScreen(
+                            title: book['book_name'] ?? '',
+                            author: author['author_name'] ?? '',
+                            coverImageUrl: imageUrl ?? '',
+                            audioUrls: urls,
+                          ),
                         ),
-                        onPressed: () {
-                          final ebookParts = book['ebook_urls'];
-                          if (ebookParts != null &&
-                              ebookParts is List &&
-                              ebookParts.every((e) => e is String)) {
+                      );
+                    } else {
+                      showSnackBar(context, 'Invalid audio parts list', type: SnackBarType.error);
+                    }
+                  },
+                ),
+                const SizedBox(height: 10),
 
-                            // publicId list ကို full URL list အဖြစ်ပြောင်းမယ်
-                            final List<String> urls = ebookParts.map((publicId) {
-                              return CloudinaryConfig.baseUrl(publicId, MediaType.ebook);
-                            }).toList();
+                // --- Save/Unsave Button ---
+                _isBookSaved
+                    ? ElevatedButton.icon(
+                  icon: const Icon(Icons.bookmark_remove),
+                  label: const Text("Unsave Book"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[100],
+                    foregroundColor: Colors.red[800],
+                    minimumSize: const Size.fromHeight(45),
+                  ),
+                  onPressed: () async {
+                    if (_currentUser == null) {
+                      showSnackBar(context, "You need to log in to unsave this book",
+                          type: SnackBarType.error);
+                      return;
+                    }
 
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => PdfMergedViewScreen(
-                                  parts: urls, // full URL list ပေးလိုက်တာ
-                                  title: book['book_name'] ?? 'Ebook',
-                                ),
-                              ),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Invalid ebook parts list')),
-                            );
-                          }
-                        }
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.audiotrack),
-                      label: const Text("Play Audio"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFA44D),
-                        foregroundColor: const Color(0xFF4B1E0A),
-                        minimumSize: const Size.fromHeight(45),
-                      ),
-                      onPressed: () {
-                        final audioParts = book['audio_urls'];
-                        if (audioParts != null &&
-                            audioParts is List &&
-                            audioParts.every((e) => e is String) &&
-                            audioParts.isNotEmpty) {
+                    try {
+                      await _bookService.removeSavedBookForUser(_currentUser!.uid, widget.bookId);
+                      setState(() => _isBookSaved = false);
+                      showSnackBar(context, "Book unsaved successfully!", type: SnackBarType.success);
+                    } catch (e) {
+                      showSnackBar(context, "Failed to unsave book. $e", type: SnackBarType.error);
+                    }
+                  },
+                )
+                    : ElevatedButton.icon(
+                  icon: const Icon(Icons.bookmark),
+                  label: const Text("Save Book"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFE2C4),
+                    foregroundColor: const Color(0xFF4B1E0A),
+                    minimumSize: const Size.fromHeight(45),
+                  ),
+                  onPressed: () async {
+                    if (_currentUser == null) {
+                      showSnackBar(context, "You need to log in to save this book",
+                          type: SnackBarType.error);
+                      return;
+                    }
 
-                          // publicId list ကို full URL list အဖြစ်ပြောင်းမယ်
-                          final List<String> urls = audioParts.map((audioPart) {
-                            return CloudinaryConfig.baseUrl(audioPart, MediaType.audio);
-                          }).toList();
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AudioPlayScreen(
-                                title: book['book_name'] ?? '',
-                                author: author['author_name'] ?? '',
-                                coverImageUrl: imageUrl ?? '',
-                                audioUrls: urls,  // list of URLs
-                              ),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Invalid audio parts list')),
-                          );
-                        }
-                      },
-                    ),
-
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      icon: const Icon(Icons.bookmark),
-                      label: const Text("Save Book"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFFE2C4),
-                        foregroundColor: const Color(0xFF4B1E0A),
-                        minimumSize: const Size.fromHeight(45),
-                      ),
-                      onPressed: () {
-                        // Save/bookmark functionality
-                      },
-                    ),
-                  ],
+                    try {
+                      await _bookService.saveBookForUser(_currentUser!.uid, widget.bookId);
+                      setState(() => _isBookSaved = true);
+                      showSnackBar(context, "Book saved successfully!", type: SnackBarType.success);
+                    } catch (e) {
+                      showSnackBar(context, "Failed to save book. $e", type: SnackBarType.error);
+                    }
+                  },
                 ),
               ],
             ),
