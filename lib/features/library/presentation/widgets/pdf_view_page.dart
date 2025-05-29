@@ -7,6 +7,8 @@ import 'dart:typed_data';
 
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
+import 'package:echoread/core/widgets/custom_gif_loading.dart';
+
 class PdfMergedViewScreen extends StatefulWidget {
   final List<String> parts; // URLs of splitted PDFs
   final String title;
@@ -36,6 +38,7 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen> {
     log(widget.parts.toString());
     final apiUrl = "https://pdf-merge-api.onrender.com/merge-pdfs";
 
+    // final apiUrl = "https://echo-read-media-split-merge.onrender.com/api/pdf/merge";
     try {
       if (widget.parts.length == 1) {
         // Just load the single PDF directly
@@ -80,14 +83,16 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const GifLoader();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : error != null
+      body: error != null
           ? Center(child: Text(error!))
           : SfPdfViewer.memory(mergedPdfBytes!),
     );

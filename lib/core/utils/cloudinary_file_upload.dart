@@ -15,72 +15,6 @@ class CloudinaryFileUpload {
     cache: false,
   );
 
-  Future<String?> uploadFileToCloudinary(
-      File file,
-      String folder, {
-        String? publicIdSuffix,
-        CloudinaryResourceType resourceType = CloudinaryResourceType.Raw,
-      }) async {
-    final fileName = path.basename(file.path);
-    final fileNameWithoutExtension = path.basenameWithoutExtension(fileName);
-    final fileExt = path.extension(file.path).replaceAll('.', '');
-    final publicId = publicIdSuffix != null
-        ? '$folder/${fileNameWithoutExtension}_$publicIdSuffix'
-        : '$folder/$fileNameWithoutExtension';
-
-    try {
-      await cloudinary.uploadFile(
-        CloudinaryFile.fromFile(
-          file.path,
-          resourceType: resourceType,
-          folder: folder,
-          publicId: publicId,
-        ),
-      );
-      return '$publicId.$fileExt';
-    } catch (e) {
-      log('❌ Upload failed: $e');
-      return null;
-    }
-  }
-
-  Future<String?> uploadChunkWithRetry(
-      File chunk,
-      String folder, {
-        String? publicIdSuffix,
-        CloudinaryResourceType resourceType = CloudinaryResourceType.Raw,
-      }) async {
-    const int maxRetries = 3;
-    int attempt = 0;
-
-    while (attempt < maxRetries) {
-      try {
-        final filePath = await uploadFileToCloudinary(
-          chunk,
-          folder,
-          publicIdSuffix: publicIdSuffix,
-          resourceType: resourceType,
-        );
-
-        if (filePath != null) {
-          log('✅ Chunk uploaded successfully on attempt ${attempt + 1}: ${chunk.path}');
-          return filePath;
-        }
-      } catch (e) {
-        log('⚠️ Error uploading chunk on attempt ${attempt + 1}: $e');
-      }
-
-      attempt++;
-      if (attempt < maxRetries) {
-        log('🔁 Retrying upload for chunk ${chunk.path} (attempt ${attempt + 1})...');
-        await Future.delayed(const Duration(seconds: 2));
-      }
-    }
-
-    log('❌ Failed to upload chunk after $maxRetries attempts: ${chunk.path}');
-    return null;
-  }
-
   Future<String?> uploadImageToCloudinary(File imageFile, String folderName) async {
     final fileNameWithoutExtension = path.basenameWithoutExtension(imageFile.path);
     final fileExt = path.extension(imageFile.path).replaceAll('.', '');
@@ -105,8 +39,8 @@ class CloudinaryFileUpload {
   Future<String?> _uploadRawFileToCloudinary(
       File file,
       String folderName,
-      String resourceType, // e.g., "raw", "video"
-      String contentType, // e.g., "application/pdf", "audio/mpeg"
+      String resourceType,
+      String contentType,
       String publicIdSuffix,
       ) async {
     final cloudName = dotenv.env['CLOUDINARY_CLOUD_NAME'];
@@ -128,10 +62,8 @@ class CloudinaryFileUpload {
     final fileNameWithoutExtension = path.basenameWithoutExtension(file.path);
     final fileExt = path.extension(file.path).replaceAll('.', '');
 
-    // Replace invalid characters for Cloudinary ID
     final safeFileName = fileNameWithoutExtension.replaceAll(RegExp(r'[^\w\u1000-\u109F\-]'), '_');
 
-    // Modify publicId format to: ebooks/စာရေးကြီး_part1
     final publicId = publicIdSuffix.isEmpty
         ? '$folderName/$safeFileName'
         : '$folderName/part_${publicIdSuffix}_$safeFileName';

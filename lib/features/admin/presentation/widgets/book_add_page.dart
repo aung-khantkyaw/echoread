@@ -41,6 +41,7 @@ class _BookAddFormState extends State<BookAddForm> {
 
   final BookManageService _bookService = BookManageService();
   final List<bool> _isUploadingAudioList = [false];
+  final bool _hasFileSizeError = false;
   bool _isLoading = false;
   bool _isUploadingEbook = false;
 
@@ -69,40 +70,120 @@ class _BookAddFormState extends State<BookAddForm> {
     });
   }
 
+  // Future<void> _pickEbookFile() async {
+  //   setState(() => _isUploadingEbook = true);
+  //
+  //   final result = await FilePicker.platform.pickFiles(
+  //     type: FileType.custom,
+  //     allowedExtensions: ['pdf', 'epub'],
+  //   );
+  //
+  //   if (!mounted) return;
+  //
+  //   if (result != null && result.files.single.path != null) {
+  //     setState(() {
+  //       _ebookFilePath = result.files.single.path!;
+  //       _isUploadingEbook = false;
+  //     });
+  //   } else {
+  //     setState(() => _isUploadingEbook = false);
+  //     showSnackBar(context, 'No ebook file selected.', type: SnackBarType.error);
+  //   }
+  // }
+
   Future<void> _pickEbookFile() async {
     setState(() => _isUploadingEbook = true);
 
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'epub'],
-    );
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'epub'],
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    if (result != null && result.files.single.path != null) {
-      setState(() {
-        _ebookFilePath = result.files.single.path!;
-        _isUploadingEbook = false;
-      });
-    } else {
+      if (result != null && result.files.single.path != null) {
+        final path = result.files.single.path!;
+        setState(() {
+          _ebookFilePath = path;
+          _isUploadingEbook = false;
+        });
+      } else {
+        setState(() => _isUploadingEbook = false);
+        showSnackBar(context, 'No ebook file selected.', type: SnackBarType.error);
+      }
+    } catch (e) {
       setState(() => _isUploadingEbook = false);
-      showSnackBar(context, 'No ebook file selected.', type: SnackBarType.error);
+      showSnackBar(context, 'Something went wrong picking the ebook file.', type: SnackBarType.error);
+      log('Ebook file pick error: $e');
     }
   }
+
+  // Future<void> _pickAudioFile(int index) async {
+  //   setState(() => _isUploadingAudioList[index] = true);
+  //
+  //   final result = await FilePicker.platform.pickFiles(type: FileType.audio);
+  //
+  //   if (!mounted) return;
+  //
+  //   if (result != null && result.files.single.path != null) {
+  //     final pickedFile = result.files.single;
+  //     final fileSizeInBytes = pickedFile.size;
+  //     final maxSizeInBytes = 100 * 1024 * 1024;
+  //
+  //     if (fileSizeInBytes > maxSizeInBytes) {
+  //       setState(() {
+  //         _isUploadingAudioList[index] = false;
+  //         _hasFileSizeError = true;
+  //         _audioFilePaths[index] = null;
+  //       });
+  //       showSnackBar(context, 'File size must be less than 100 MB.', type: SnackBarType.error);
+  //       return;
+  //     }
+  //
+  //     setState(() {
+  //       _audioFilePaths[index] = pickedFile.path;
+  //       _isUploadingAudioList[index] = false;
+  //       _hasFileSizeError = false;
+  //     });
+  //   } else {
+  //     setState(() => _isUploadingAudioList[index] = false);
+  //     showSnackBar(context, 'No audio file selected.', type: SnackBarType.error);
+  //   }
+  // }
+
+
+  // Future<void> _pickAudioFile(int index) async {
+  //   setState(() => _isUploadingAudioList[index] = true);
+  //
+  //   final success = await MediaPickerHelper.pickAudio((path) {
+  //     setState(() {
+  //       _audioFilePaths[index] = path;
+  //       _isUploadingAudioList[index] = false;
+  //     });
+  //   });
+  //
+  //   if (!mounted) return;
+  //
+  //   if (!success) {
+  //     setState(() => _isUploadingAudioList[index] = false);
+  //     showSnackBar(context, 'Please allow audio access to select a file.', type: SnackBarType.error);
+  //   }
+  // }
 
   Future<void> _pickAudioFile(int index) async {
     setState(() => _isUploadingAudioList[index] = true);
 
-    final success = await MediaPickerHelper.pickAudio((path) {
+    final path = await MediaPickerHelper.pickAudio();
+
+    if (!mounted) return;
+
+    if (path != null) {
       setState(() {
         _audioFilePaths[index] = path;
         _isUploadingAudioList[index] = false;
       });
-    });
-
-    if (!mounted) return;
-
-    if (!success) {
+    } else {
       setState(() => _isUploadingAudioList[index] = false);
       showSnackBar(context, 'Please allow audio access to select a file.', type: SnackBarType.error);
     }
@@ -251,7 +332,8 @@ class _BookAddFormState extends State<BookAddForm> {
                   ),
                   const SizedBox(height: 8),
                   ElevatedButton(
-                    onPressed: _submitForm,
+                    // onPressed: _isLoading ? null : _submitForm,
+                    onPressed: (_isLoading || _hasFileSizeError) ? null : _submitForm,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFFFF8C2D),
                       foregroundColor: const Color(0xFF4B1E0A),
@@ -264,7 +346,7 @@ class _BookAddFormState extends State<BookAddForm> {
                         fontFamily: 'AncizarSerifBold',
                       ),
                     ),
-                    child: Text(locale.save_book),
+                    child: _isLoading ? Text(locale.adding) : Text(locale.save_book),
                   ),
                 ],
               ),

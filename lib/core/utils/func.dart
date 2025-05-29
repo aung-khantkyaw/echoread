@@ -1,13 +1,12 @@
 import 'dart:io';
-import 'dart:ui';
+import 'dart:developer';
 
-import 'package:ffmpeg_kit_flutter/ffprobe_kit.dart';
-import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:path_provider/path_provider.dart';
 
 Future<bool> checkIsLoggedIn() async {
   await Future.delayed(Duration(seconds: 3));
@@ -36,66 +35,78 @@ Future<bool> requestStoragePermission() async {
   return status.isGranted;
 }
 
-Future<List<File>> splitPdfByPage(File pdfFile, int chunkPageCount) async {
-  final bytes = await pdfFile.readAsBytes();
-  final document = PdfDocument(inputBytes: bytes);
-
-  final List<File> chunkFiles = [];
-  final totalPages = document.pages.count;
-
-  for (int i = 0; i < totalPages; i += chunkPageCount) {
-    final newDoc = PdfDocument();
-
-    for (int j = i; j < i + chunkPageCount && j < totalPages; j++) {
-      final template = document.pages[j].createTemplate();
-      newDoc.pages.add().graphics.drawPdfTemplate(template, const Offset(0, 0));
-    }
-
-    final chunkBytes = newDoc.saveSync();
-    newDoc.dispose();
-
-    final chunkFile = File('${pdfFile.path}_chunk_$i.pdf');
-    await chunkFile.writeAsBytes(chunkBytes);
-    chunkFiles.add(chunkFile);
-  }
-
-  document.dispose();
-  return chunkFiles;
+// Wrapper for compute()
+Future<List<String>> splitPdfByPageWrapper(Map<String, dynamic> args) {
+  return splitPdfByPage(File(args['filePath']), args['pagesPerChunk']);
 }
 
-Future<List<File>> splitAudioByDuration(File inputFile, int chunkDurationInSeconds) async {
-  final tempDir = await getTemporaryDirectory();
-  final inputPath = inputFile.path;
-  final outputBaseName = path.basenameWithoutExtension(inputPath);
-  final outputExt = path.extension(inputPath);
-  final outputDir = path.join(tempDir.path, 'audio_chunks_${DateTime.now().millisecondsSinceEpoch}');
-  Directory(outputDir).createSync(recursive: true);
+Future<List<String>> splitAudioByDurationWrapper(Map<String, dynamic> args) {
+  return splitAudioByDuration(File(args['filePath']), args['durationMinutes']);
+}
 
-  final totalDuration = await getAudioDuration(inputPath);
-  final numChunks = (totalDuration / chunkDurationInSeconds).ceil();
-
-  List<File> chunks = [];
-
-  for (int i = 0; i < numChunks; i++) {
-    final outFile = File(path.join(outputDir, '${outputBaseName}_chunk_$i$outputExt'));
-    final startTime = i * chunkDurationInSeconds;
-
-    await FFmpegKit.execute(
-      '-i "$inputPath" -ss $startTime -t $chunkDurationInSeconds -c copy "${outFile.path}"',
+// PDF Split Logic
+Future<List<String>> splitPdfByPage(File pdfFile, int pagesPerChunk) async {
+  log('File Path : $pdfFile');
+  final uri = Uri.parse('https://echo-read-media-split-merge.onrender.com/api/pdf/split');
+  // final uri = Uri.parse('http://192.168.100.28:3000/api/pdf/split');
+  final request = http.MultipartRequest('POST', uri)
+    ..fields['pages_per_chunk'] = pagesPerChunk.toString()
+    ..files.add(
+      await http.MultipartFile.fromPath(
+        'pdf',
+        pdfFile.path,
+        filename: path.basename(pdfFile.path), // original filename
+      ),
     );
 
-    if (await outFile.exists()) {
-      chunks.add(outFile);
-    }
-  }
+  final response = await request.send();
 
-  return chunks;
+  if (response.statusCode == 200) {
+    final respStr = await response.stream.bytesToString();
+    final data = jsonDecode(respStr);
+
+    // ✅ Fix: safely extract the list from the 'files' key
+    final files = data['files'];
+    if (files is List) {
+      return List<String>.from(files);
+    } else {
+      throw Exception('Invalid response format');
+    }
+  } else {
+    throw Exception('Failed to split PDF (status: ${response.statusCode})');
+  }
 }
 
-Future<int> getAudioDuration(String filePath) async {
-  final session = await FFprobeKit.getMediaInformation(filePath);
-  final info = session.getMediaInformation();
-  final duration = info?.getDuration();
-  if (duration == null) throw Exception('Audio duration not found');
-  return double.parse(duration).round();
+
+// Audio Split Logic
+Future<List<String>> splitAudioByDuration(File audioFile, int durationMinutes) async {
+  try {
+    final uri = Uri.parse('https://echo-read-media-split-merge.onrender.com/api/audio/split');
+    // final uri = Uri.parse('http://192.168.100.28:3000/api/audio/split');
+    final request = http.MultipartRequest('POST', uri)
+      ..fields['duration'] = durationMinutes.toString()
+      ..files.add(await http.MultipartFile.fromPath(
+        'audio',
+        audioFile.path,
+        filename: utf8.decode(utf8.encode(path.basename(audioFile.path))),
+      ));
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final respStr = await response.stream.bytesToString();
+      final data = jsonDecode(respStr);
+
+      if (data['files'] != null && data['files'] is List) {
+        return List<String>.from(data['files']);
+      } else {
+        throw Exception('Invalid response format from split API');
+      }
+    } else {
+      final respStr = await response.stream.bytesToString();
+      throw Exception('Split API failed: $respStr');
+    }
+  } catch (e) {
+    rethrow;
+  }
 }
