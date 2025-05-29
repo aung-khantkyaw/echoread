@@ -1,82 +1,11 @@
-// import 'package:flutter/material.dart';
-//
-// import 'package:echoread/core/config/cloudinary_config.dart';
-//
-// import 'package:echoread/l10n/app_localizations.dart';
-//
-// import '../../../../core/widgets/book_card.dart';
-// import 'book_add_page.dart';
-//
-// class BookManage extends StatefulWidget {
-//   final List<Map<String, dynamic>> booksList;
-//   final List<Map<String, dynamic>> authorsList;
-//
-//   const BookManage({
-//     super.key,
-//     required this.booksList,
-//     required this.authorsList,
-//   });
-//
-//   @override
-//   State<BookManage> createState() => _BookManageState();
-// }
-//
-// class _BookManageState extends State<BookManage> {
-//   void _goToAddBook() {
-//     Navigator.of(context).push(
-//       MaterialPageRoute(
-//         builder: (context) => BookAddForm(
-//           authorsList: widget.authorsList,
-//         ),
-//       ),
-//     );
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     // log(widget.booksList.toString());
-//     final locale = AppLocalizations.of(context)!;
-//
-//     return Column(
-//       children: [
-//         ElevatedButton(
-//           onPressed: _goToAddBook,
-//           child: Text(locale.add_book),
-//         ),
-//         const SizedBox(height: 10),
-//         Expanded(
-//           child: ListView.builder(
-//             itemCount: widget.booksList.length,
-//             itemBuilder: (context, index) {
-//               final book = widget.booksList[index];
-//               return bookCard(
-//                 context: context,
-//                 bookId: book['id']?.toString() ?? '',
-//                 imageUrl: book['book_img'] ?? '',
-//                 title: book['book_name'] ?? '',
-//                 subtitle: book['book_description'] ?? '',
-//                 author: book['author']?['author_name'] ?? '',
-//               );
-//             },
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
-
-
-
 import 'package:echoread/core/widgets/show_snack_bar.dart';
 import 'package:flutter/material.dart';
 
-import 'package:echoread/core/config/cloudinary_config.dart';
 import 'package:echoread/l10n/app_localizations.dart';
 import 'package:echoread/core/widgets/book_card.dart';
 
 import '../../services/book_manage_service.dart';
 import 'book_add_page.dart';
-import 'book_update_page.dart';
 
 class BookManage extends StatefulWidget {
   final List<Map<String, dynamic>> booksList;

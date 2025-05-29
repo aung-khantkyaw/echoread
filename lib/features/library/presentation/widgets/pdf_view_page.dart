@@ -15,11 +15,13 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 class PdfMergedViewScreen extends StatefulWidget {
   final List<String> parts;
   final String title;
+  final String bookId;
 
   const PdfMergedViewScreen({
     super.key,
     required this.parts,
     required this.title,
+    required this.bookId
   });
 
   @override
@@ -96,7 +98,7 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
       final query = await _firestore
           .collection('reading_status')
           .where('userId', isEqualTo: user.uid)
-          .where('bookId', isEqualTo: widget.title)
+          .where('bookId', isEqualTo: widget.bookId)
           .where('isComplete', isEqualTo: false)
           .limit(1)
           .get();
@@ -111,7 +113,7 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
         _remainingMinutes = totalPages;
         final docRef = await _firestore.collection('reading_status').add({
           'userId': user.uid,
-          'bookId': widget.title,
+          'bookId': widget.bookId,
           'startDate': Timestamp.now(),
           'isComplete': false,
           'lastReadPage': 1,

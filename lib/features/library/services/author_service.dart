@@ -27,6 +27,7 @@ class AuthorService {
           'id': authorId,
           'name': data['author_name']?.toString() ?? 'Unknown',
           'book_count': bookCount,
+          'profile_img': data['profile_img']?.toString(),
         };
       }).toList());
 

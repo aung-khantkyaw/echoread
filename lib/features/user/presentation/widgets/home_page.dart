@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:echoread/core/widgets/book_card.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class HomeContentPage extends StatefulWidget {
   final List<Map<String, dynamic>> allBooks;
 
@@ -49,6 +51,8 @@ class _HomeContentPageState extends State<HomeContentPage> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,12 +70,12 @@ class _HomeContentPageState extends State<HomeContentPage> {
           const SizedBox(height: 30),
 
           // Section title
-          const Padding(
-            padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
+          Padding(
+            padding: EdgeInsets.only(left: 6.0, bottom: 16.0),
             child: Text(
-              'Currently Reading',
+              loc.latest_books,
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.black,
               ),
