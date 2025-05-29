@@ -32,6 +32,38 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
     super.initState();
     _player = AudioPlayer();
     _setupAudio();
+
+    // Current position update
+    _player.positionStream.listen((position) {
+      setState(() {
+        _current = position;
+      });
+    });
+
+    // Player play/pause state update
+    _player.playerStateStream.listen((state) {
+      setState(() {
+        _isPlaying = state.playing;
+      });
+    });
+
+    // Current index update
+    _player.currentIndexStream.listen((index) {
+      if (index != null) {
+        setState(() {
+          _currentIndex = index;
+        });
+      }
+    });
+
+    // Listen to sequenceStateStream to update total duration of current track
+    _player.sequenceStateStream.listen((sequenceState) {
+      final currentSource = sequenceState?.currentSource;
+      final dur = currentSource?.duration ?? Duration.zero;
+      setState(() {
+        _total = dur;
+      });
+    });
   }
 
   Future<void> _setupAudio() async {
@@ -42,25 +74,8 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
 
       await _player.setAudioSource(playlist);
 
-      _player.durationStream.listen((duration) {
-        setState(() {
-          _total = duration ?? Duration.zero;
-        });
-      });
-
-      _player.positionStream.listen((position) {
-        setState(() => _current = position);
-      });
-
-      _player.playerStateStream.listen((state) {
-        setState(() => _isPlaying = state.playing);
-      });
-
-      _player.currentIndexStream.listen((index) {
-        setState(() {
-          if (index != null) _currentIndex = index;
-        });
-      });
+      // Optionally autoplay
+      // _player.play();
     } catch (e) {
       log('Audio load error: $e');
     }
@@ -77,8 +92,8 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   }
 
   String _formatTime(Duration duration) {
-    final minutes = duration.inMinutes.toString().padLeft(1, '0');
-    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
     return '$minutes:$seconds';
   }
 
@@ -90,7 +105,12 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F1B14),
+      backgroundColor: const Color(0xFFFFE2C4),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF56B00),
+        title: Text(widget.title, style: const TextStyle(color: Color(0xFF4B1E0A))),
+        iconTheme: const IconThemeData(color: Color(0xFF4B1E0A)),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -102,61 +122,51 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
                 child: Image.network(
                   widget.coverImageUrl,
                   height: 250,
-                  width: double.infinity,
+                  width: 200,
                   fit: BoxFit.cover,
                 ),
               ),
-              const SizedBox(height: 24),
-              Text(
-                widget.title,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              Text(
-                widget.author,
-                style: const TextStyle(fontSize: 18, color: Colors.greenAccent),
-              ),
               const SizedBox(height: 20),
 
-              // Slider
+              // Slider with time
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(_formatTime(_current), style: const TextStyle(color: Colors.white70)),
-                  Text(_formatTime(_total), style: const TextStyle(color: Colors.white70)),
+                  Text(_formatTime(_current), style: const TextStyle(color: Color(0xFF4B1E0A))),
+                  Text(_formatTime(_total), style: const TextStyle(color: Color(0xFF4B1E0A))),
                 ],
               ),
               Slider(
                 value: _current.inSeconds.toDouble().clamp(0, _total.inSeconds.toDouble()),
-                max: _total.inSeconds.toDouble().clamp(1, double.infinity),
-                onChanged: (value) => _player.seek(Duration(seconds: value.toInt())),
-                activeColor: Colors.greenAccent,
-                inactiveColor: Colors.white12,
+                max: _total.inSeconds.toDouble() > 0 ? _total.inSeconds.toDouble() : 1,
+                onChanged: (value) {
+                  _player.seek(Duration(seconds: value.toInt()));
+                },
+                activeColor: const Color(0xFFFF8C2D),
+                inactiveColor: Colors.white,
               ),
-              const SizedBox(height: 24),
+
+              const SizedBox(height: 4),
 
               // Playback Controls
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.skip_previous, size: 32, color: Colors.greenAccent),
+                    icon: const Icon(Icons.skip_previous, size: 32, color: Color(0xFFFF8C2D)),
                     onPressed: () => _player.seekToPrevious(),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.replay_10, size: 32, color: Colors.greenAccent),
+                    icon: const Icon(Icons.replay_10, size: 32, color: Color(0xFFFF8C2D)),
                     onPressed: () {
                       final newPosition = _current - const Duration(seconds: 10);
                       _player.seek(newPosition > Duration.zero ? newPosition : Duration.zero);
                     },
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   CircleAvatar(
                     radius: 32,
-                    backgroundColor: Colors.greenAccent,
+                    backgroundColor: const Color(0xFFFF8C2D),
                     child: IconButton(
                       icon: Icon(
                         _isPlaying ? Icons.pause : Icons.play_arrow,
@@ -166,32 +176,31 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
                       onPressed: _togglePlayback,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   IconButton(
-                    icon: const Icon(Icons.forward_10, size: 32, color: Colors.greenAccent),
+                    icon: const Icon(Icons.forward_10, size: 32, color: Color(0xFFFF8C2D)),
                     onPressed: () {
                       final newPosition = _current + const Duration(seconds: 10);
-                      if (_total != Duration.zero && newPosition < _total) {
-                        _player.seek(newPosition);
-                      }
+                      final clamped = newPosition > _total ? _total : newPosition;
+                      _player.seek(clamped);
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.skip_next, size: 32, color: Colors.greenAccent),
+                    icon: const Icon(Icons.skip_next, size: 32, color: Color(0xFFFF8C2D)),
                     onPressed: () => _player.seekToNext(),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Up Next',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF4B1E0A)),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
 
               // Up Next List
               Expanded(
@@ -210,10 +219,10 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
                         audioName,
                         style: TextStyle(
                           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          color: isSelected ? Colors.white : Colors.white70,
+                          color: isSelected ? const Color(0xFF4B1E0A) : Colors.black,
                         ),
                       ),
-                      subtitle: Text(widget.author, style: const TextStyle(color: Colors.greenAccent)),
+                      subtitle: Text(widget.author, style: const TextStyle(color: Color(0xFF4B1E0A))),
                       onTap: () => _playAtIndex(index),
                     );
                   },

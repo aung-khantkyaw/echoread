@@ -23,7 +23,7 @@ Widget buildFilePicker({
                 ),
                 child: Text(
                   isUploading
-                      ? 'Uploading...' // <-- Show this if uploading
+                      ? 'Uploading...'
                       : (filePath != null ? filePath.split('/').last : placeholder),
                   style: const TextStyle(fontSize: 14, color: Colors.black87),
                 ),

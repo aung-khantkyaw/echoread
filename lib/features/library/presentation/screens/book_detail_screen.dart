@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:echoread/core/utils/func.dart';
 
 import 'package:echoread/core/widgets/app_bar.dart';
-import 'package:echoread/core/widgets/bottom_nav_bar.dart';
 import 'package:echoread/core/widgets/custom_gif_loading.dart';
 
 import '../widgets/book_detail_page.dart';
@@ -56,7 +55,6 @@ class _BookDetailPageState extends State<BookDetailPage> {
         context: context,
       ),
       body: BookDetailsScreen(bookId: widget.bookId),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );
   }
 }

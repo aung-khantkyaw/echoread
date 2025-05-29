@@ -17,7 +17,7 @@ Widget bookCard({
       child: InkWell(
         borderRadius: BorderRadius.circular(8.0),
         onTap: () {
-          Navigator.pushReplacementNamed(
+          Navigator.pushNamed(
             context,
             '/book-detail',
             arguments: {'bookId': bookId},

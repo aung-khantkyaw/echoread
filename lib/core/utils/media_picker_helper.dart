@@ -40,7 +40,7 @@ class MediaPickerHelper {
     }
   }
 
-  static Future<bool> pickAudio(Function(String path) onAudioPicked) async {
+  static Future<String?> pickAudio() async {
     final sdkInt = Platform.isAndroid ? await _getAndroidSdkInt() : 0;
 
     PermissionStatus permissionStatus;
@@ -54,17 +54,16 @@ class MediaPickerHelper {
     if (permissionStatus.isGranted) {
       final result = await FilePicker.platform.pickFiles(type: FileType.audio);
       if (result != null && result.files.single.path != null) {
-        onAudioPicked(result.files.single.path!);
-        return true;
+        return result.files.single.path!;
       } else {
         log('No audio selected.');
-        return false;
+        return null;
       }
     } else {
       if (permissionStatus.isPermanentlyDenied) {
         openAppSettings();
       }
-      return false;
+      return null;
     }
   }
 }

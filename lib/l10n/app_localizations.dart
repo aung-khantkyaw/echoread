@@ -95,29 +95,155 @@ abstract class AppLocalizations {
     Locale('my')
   ];
 
-  /// No description provided for @settings.
+  /// No description provided for @about.
   ///
   /// In en, this message translates to:
-  /// **'Settings'**
-  String get settings;
+  /// **'About'**
+  String get about;
 
-  /// No description provided for @language.
+  /// No description provided for @add.
   ///
   /// In en, this message translates to:
-  /// **'Language'**
-  String get language;
+  /// **'Add'**
+  String get add;
 
-  /// No description provided for @update_account.
+  /// No description provided for @add_another_audio_file.
   ///
   /// In en, this message translates to:
-  /// **'Update Account'**
-  String get update_account;
+  /// **'Add another audio file'**
+  String get add_another_audio_file;
 
-  /// No description provided for @password_reset.
+  /// No description provided for @add_author.
   ///
   /// In en, this message translates to:
-  /// **'Password Reset'**
-  String get password_reset;
+  /// **'Add Author'**
+  String get add_author;
+
+  /// No description provided for @add_book.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Book'**
+  String get add_book;
+
+  /// No description provided for @adding.
+  ///
+  /// In en, this message translates to:
+  /// **'Adding . . . '**
+  String get adding;
+
+  /// No description provided for @audio_file.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio File'**
+  String get audio_file;
+
+  /// No description provided for @author.
+  ///
+  /// In en, this message translates to:
+  /// **'author'**
+  String get author;
+
+  /// No description provided for @author_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Author Name'**
+  String get author_name;
+
+  /// No description provided for @book.
+  ///
+  /// In en, this message translates to:
+  /// **'book'**
+  String get book;
+
+  /// No description provided for @book_count.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Count'**
+  String get book_count;
+
+  /// No description provided for @book_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Description'**
+  String get book_description;
+
+  /// No description provided for @book_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Name'**
+  String get book_name;
+
+  /// No description provided for @books.
+  ///
+  /// In en, this message translates to:
+  /// **'Books'**
+  String get books;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @collections.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get collections;
+
+  /// No description provided for @confirm_delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get confirm_delete;
+
+  /// No description provided for @confirm_deletion.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Deletion'**
+  String get confirm_deletion;
+
+  /// No description provided for @currently_reading.
+  ///
+  /// In en, this message translates to:
+  /// **'Currently Reading'**
+  String get currently_reading;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @delete_account.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get delete_account;
+
+  /// No description provided for @delete_account_confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete your account?'**
+  String get delete_account_confirm;
+
+  /// No description provided for @delete_author.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this author?'**
+  String get delete_author;
+
+  /// No description provided for @downloads.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloads'**
+  String get downloads;
+
+  /// No description provided for @ebook_file.
+  ///
+  /// In en, this message translates to:
+  /// **'Ebook File'**
+  String get ebook_file;
 
   /// No description provided for @email_address_change.
   ///
@@ -125,23 +251,23 @@ abstract class AppLocalizations {
   /// **'Email Address Change'**
   String get email_address_change;
 
-  /// No description provided for @about.
+  /// No description provided for @explore.
   ///
   /// In en, this message translates to:
-  /// **'About'**
-  String get about;
+  /// **'Explore'**
+  String get explore;
 
-  /// No description provided for @privacy_policy.
+  /// No description provided for @explore_authors.
   ///
   /// In en, this message translates to:
-  /// **'Privacy Policy'**
-  String get privacy_policy;
+  /// **'Explore authors'**
+  String get explore_authors;
 
-  /// No description provided for @terms_of_service.
+  /// No description provided for @finished.
   ///
   /// In en, this message translates to:
-  /// **'Terms of Service'**
-  String get terms_of_service;
+  /// **'Finished'**
+  String get finished;
 
   /// No description provided for @help_center.
   ///
@@ -155,65 +281,17 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
-  /// No description provided for @explore.
+  /// No description provided for @items.
   ///
   /// In en, this message translates to:
-  /// **'Explore'**
-  String get explore;
+  /// **'items'**
+  String get items;
 
-  /// No description provided for @my_library.
+  /// No description provided for @language.
   ///
   /// In en, this message translates to:
-  /// **'My Library'**
-  String get my_library;
-
-  /// No description provided for @settings_screen.
-  ///
-  /// In en, this message translates to:
-  /// **'Setting'**
-  String get settings_screen;
-
-  /// No description provided for @search_authors_hint.
-  ///
-  /// In en, this message translates to:
-  /// **'Search for authors'**
-  String get search_authors_hint;
-
-  /// No description provided for @explore_authors.
-  ///
-  /// In en, this message translates to:
-  /// **'Explore authors'**
-  String get explore_authors;
-
-  /// No description provided for @no_authors_found.
-  ///
-  /// In en, this message translates to:
-  /// **'No authors found'**
-  String get no_authors_found;
-
-  /// No description provided for @unknown_author.
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown Author'**
-  String get unknown_author;
-
-  /// No description provided for @no_books.
-  ///
-  /// In en, this message translates to:
-  /// **'No books'**
-  String get no_books;
-
-  /// No description provided for @book.
-  ///
-  /// In en, this message translates to:
-  /// **'book'**
-  String get book;
-
-  /// No description provided for @books.
-  ///
-  /// In en, this message translates to:
-  /// **'books'**
-  String get books;
+  /// **'Language'**
+  String get language;
 
   /// No description provided for @logout.
   ///
@@ -221,35 +299,53 @@ abstract class AppLocalizations {
   /// **'Log out'**
   String get logout;
 
-  /// No description provided for @delete_account.
+  /// No description provided for @myHistory.
   ///
   /// In en, this message translates to:
-  /// **'Delete Account'**
-  String get delete_account;
+  /// **'My History'**
+  String get myHistory;
 
-  /// No description provided for @confirm_deletion.
+  /// No description provided for @my_library.
   ///
   /// In en, this message translates to:
-  /// **'Confirm Deletion'**
-  String get confirm_deletion;
+  /// **'My Library'**
+  String get my_library;
 
-  /// No description provided for @delete_account_confirm.
+  /// No description provided for @no_authors_found.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete your account?'**
-  String get delete_account_confirm;
+  /// **'No authors found'**
+  String get no_authors_found;
 
-  /// No description provided for @cancel.
+  /// No description provided for @no_books.
   ///
   /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
+  /// **'No books'**
+  String get no_books;
 
-  /// No description provided for @delete.
+  /// No description provided for @no_file_selected.
   ///
   /// In en, this message translates to:
-  /// **'Delete'**
-  String get delete;
+  /// **'No file selected'**
+  String get no_file_selected;
+
+  /// No description provided for @password_reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Password Reset'**
+  String get password_reset;
+
+  /// No description provided for @privacy_policy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacy_policy;
+
+  /// No description provided for @save_book.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Book'**
+  String get save_book;
 
   /// No description provided for @saved.
   ///
@@ -257,89 +353,17 @@ abstract class AppLocalizations {
   /// **'Saved'**
   String get saved;
 
-  /// No description provided for @collections.
+  /// No description provided for @search_authors_hint.
   ///
   /// In en, this message translates to:
-  /// **'Collections'**
-  String get collections;
+  /// **'Search for authors'**
+  String get search_authors_hint;
 
-  /// No description provided for @finished.
+  /// No description provided for @select_author.
   ///
   /// In en, this message translates to:
-  /// **'Finished'**
-  String get finished;
-
-  /// No description provided for @downloads.
-  ///
-  /// In en, this message translates to:
-  /// **'Downloads'**
-  String get downloads;
-
-  /// No description provided for @myHistory.
-  ///
-  /// In en, this message translates to:
-  /// **'My History'**
-  String get myHistory;
-
-  /// No description provided for @items.
-  ///
-  /// In en, this message translates to:
-  /// **'items'**
-  String get items;
-
-  /// No description provided for @author.
-  ///
-  /// In en, this message translates to:
-  /// **'author'**
-  String get author;
-
-  /// No description provided for @update_author.
-  ///
-  /// In en, this message translates to:
-  /// **'Update Author'**
-  String get update_author;
-
-  /// No description provided for @add_author.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Author'**
-  String get add_author;
-
-  /// No description provided for @author_name.
-  ///
-  /// In en, this message translates to:
-  /// **'Author Name'**
-  String get author_name;
-
-  /// No description provided for @book_count.
-  ///
-  /// In en, this message translates to:
-  /// **'Book Count'**
-  String get book_count;
-
-  /// No description provided for @update.
-  ///
-  /// In en, this message translates to:
-  /// **'Update'**
-  String get update;
-
-  /// No description provided for @add.
-  ///
-  /// In en, this message translates to:
-  /// **'Add'**
-  String get add;
-
-  /// No description provided for @confirm_delete.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm Delete'**
-  String get confirm_delete;
-
-  /// No description provided for @delete_author.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to delete this author?'**
-  String get delete_author;
+  /// **'Select Author'**
+  String get select_author;
 
   /// No description provided for @select_image.
   ///
@@ -353,59 +377,53 @@ abstract class AppLocalizations {
   /// **'Tap to choose an image'**
   String get select_image_hint;
 
-  /// No description provided for @add_book.
+  /// No description provided for @settings.
   ///
   /// In en, this message translates to:
-  /// **'Add Book'**
-  String get add_book;
+  /// **'Settings'**
+  String get settings;
 
-  /// No description provided for @book_name.
+  /// No description provided for @settings_screen.
   ///
   /// In en, this message translates to:
-  /// **'Book Name'**
-  String get book_name;
+  /// **'Setting'**
+  String get settings_screen;
 
-  /// No description provided for @select_author.
+  /// No description provided for @terms_of_service.
   ///
   /// In en, this message translates to:
-  /// **'Select Author'**
-  String get select_author;
+  /// **'Terms of Service'**
+  String get terms_of_service;
 
-  /// No description provided for @ebook_file.
+  /// No description provided for @unknown_author.
   ///
   /// In en, this message translates to:
-  /// **'Ebook File'**
-  String get ebook_file;
+  /// **'Unknown Author'**
+  String get unknown_author;
 
-  /// No description provided for @audio_file.
+  /// No description provided for @update.
   ///
   /// In en, this message translates to:
-  /// **'Audio File'**
-  String get audio_file;
+  /// **'Update'**
+  String get update;
 
-  /// No description provided for @add_another_audio_file.
+  /// No description provided for @update_account.
   ///
   /// In en, this message translates to:
-  /// **'Add another audio file'**
-  String get add_another_audio_file;
+  /// **'Update Account'**
+  String get update_account;
 
-  /// No description provided for @no_file_selected.
+  /// No description provided for @update_author.
   ///
   /// In en, this message translates to:
-  /// **'No file selected'**
-  String get no_file_selected;
+  /// **'Update Author'**
+  String get update_author;
 
-  /// No description provided for @book_description.
+  /// No description provided for @updating.
   ///
   /// In en, this message translates to:
-  /// **'Book Description'**
-  String get book_description;
-
-  /// No description provided for @save_book.
-  ///
-  /// In en, this message translates to:
-  /// **'Save Book'**
-  String get save_book;
+  /// **'Updating . . . '**
+  String get updating;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

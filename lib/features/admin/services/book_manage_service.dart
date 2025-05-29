@@ -2,10 +2,10 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:echoread/core/utils/cloudinary_file_upload.dart';
-
-import '../../../core/utils/func.dart';
+import 'package:echoread/core/utils/func.dart';
 
 class BookManageService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -14,8 +14,7 @@ class BookManageService {
     try {
       final booksSnapshot = await _firestore.collection('books').get();
 
-      final books = booksSnapshot.docs.map((doc) =>
-      {
+      final books = booksSnapshot.docs.map((doc) => {
         ...doc.data(),
         'id': doc.id,
       }).toList();
@@ -34,8 +33,7 @@ class BookManageService {
         for (var doc in authorsSnapshot.docs) doc.id: doc.data()
       };
 
-      return books.map((book) =>
-      {
+      return books.map((book) => {
         ...book,
         'author': authorsMap[book['author_id']],
       }).toList();
@@ -44,7 +42,6 @@ class BookManageService {
       return [];
     }
   }
-
 
   Future<void> createBook({
     required File bookImage,
@@ -59,58 +56,65 @@ class BookManageService {
     try {
       final cloudinaryUploader = CloudinaryFileUpload();
 
-      // Upload book image
       log('Uploading book image');
       final bookImgPath = await cloudinaryUploader.uploadImageToCloudinary(bookImage, 'book_cover');
-
       if (bookImgPath == null) throw Exception('Book image upload failed.');
 
-      // Upload eBook
       final List<String> ebookPaths = [];
       final ebookSize = ebookFile.lengthSync();
 
       if (ebookSize > 10 * 1024 * 1024) {
         log('eBook is too large, splitting by pages...');
 
-        final chunks = await splitPdfByPage(ebookFile, 10); // Each chunk ~10 pages
+        final stopwatch = Stopwatch()..start();
+        final chunks = await compute(splitPdfByPageWrapper, {
+          'filePath': ebookFile.path,
+          'pagesPerChunk': 50,
+        });
+        log('PDF split in ${stopwatch.elapsed}');
 
-        for (final chunk in chunks) {
-          final path = await cloudinaryUploader.uploadPdfToCloudinary(chunk, 'ebooks');
-          if (path == null) throw Exception('Failed to upload ebook chunk');
-          ebookPaths.add(path);
-          chunk.deleteSync(); // cleanup
-        }
+        log(chunks.toString());
+
+        ebookPaths.addAll(chunks);
+
       } else {
+        log('Uploading eBook');
         final path = await cloudinaryUploader.uploadPdfToCloudinary(ebookFile, 'ebooks');
         if (path == null) throw Exception('eBook upload failed');
         ebookPaths.add(path);
       }
 
-      // Upload audio files
-      final List<String> audioPaths = [];
-
       log('Uploading ${audioFiles.length} audio file(s)');
-      for (final audioFile in audioFiles) {
-        final sizeInMB = audioFile.lengthSync() / (1024 * 1024);
 
-        List<File> audioChunks = [];
+      final futures = audioFiles.map((file) async {
+        final audioSizeMB = file.lengthSync() / (1024 * 1024);
 
-        if (sizeInMB > 100) {
-          log('Audio file too big (${sizeInMB.toStringAsFixed(2)} MB), splitting...');
-          audioChunks = await splitAudioByDuration(audioFile, 600); // every 10 mins
+        if (audioSizeMB > 100) {
+          log('${file.path} is too large ($audioSizeMB MB), splitting...');
+
+          final parts = await compute(splitAudioByDurationWrapper, {
+            'filePath': file.path,
+            'durationMinutes': 60,
+          });
+
+          log(parts.toString());
+          return parts;
+
         } else {
-          audioChunks = [audioFile];
+          log('${file.path} is under 100MB, uploading directly...');
+          final uploadedPath = await cloudinaryUploader.uploadAudioToCloudinary(file, 'book_audios');
+          if (uploadedPath == null) throw Exception('Audio upload failed for ${file.path}');
+          return [uploadedPath];
         }
+      });
 
-        for (final chunk in audioChunks) {
-          final path = await cloudinaryUploader.uploadAudioToCloudinary(chunk, 'book_audio');
-          if (path == null) throw Exception('Audio upload failed');
-          audioPaths.add(path);
-          chunk.deleteSync(); // Clean up chunk files
-        }
-      }
+      final List<List<String>> results = await Future.wait(futures);
+      final audioPaths = results.expand((x) => x).toList();
 
       if (audioPaths.isEmpty || ebookPaths.isEmpty) {
+        if (audioPaths.isEmpty) {
+          throw Exception('Audio upload returned empty paths');
+        }
         throw Exception('Upload returned empty paths');
       }
 
@@ -134,5 +138,4 @@ class BookManageService {
       rethrow;
     }
   }
-
 }
