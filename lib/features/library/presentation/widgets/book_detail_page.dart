@@ -142,6 +142,7 @@ class _BookDetailsScreenState extends State<BookDetailsScreen> {
                           builder: (_) => PdfMergedViewScreen(
                             parts: urls,
                             title: book['book_name'] ?? 'Ebook',
+                            bookId: widget.bookId
                           ),
                         ),
                       );

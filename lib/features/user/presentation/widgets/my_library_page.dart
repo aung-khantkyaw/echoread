@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/l10n/app_localizations.dart';
@@ -6,10 +7,12 @@ import 'package:echoread/core/widgets/book_card.dart';
 import 'package:echoread/core/widgets/library_category_item.dart';
 import 'package:echoread/core/widgets/show_snack_bar.dart';
 
-class MyLibraryScreen extends StatefulWidget {
-  final List<Map<String, dynamic>> allBooks;
+import '../../services/book_service.dart';
 
-  const MyLibraryScreen({super.key, required this.allBooks});
+class MyLibraryScreen extends StatefulWidget {
+  final List<Map<String, dynamic>> currentReadingBooks;
+
+  const MyLibraryScreen({super.key, required this.currentReadingBooks});
 
   @override
   State<MyLibraryScreen> createState() => _MyLibraryScreenState();
@@ -17,11 +20,28 @@ class MyLibraryScreen extends StatefulWidget {
 
 class _MyLibraryScreenState extends State<MyLibraryScreen> {
   late List<Map<String, dynamic>> _books;
+  int _allBooksCount = 0;
+  int _saveBooksCount = 0;
+  int _finishBookCount = 0;
+  final BookService _bookService = BookService();
 
   @override
   void initState() {
     super.initState();
-    _books = List<Map<String, dynamic>>.from(widget.allBooks);
+    _books = List<Map<String, dynamic>>.from(widget.currentReadingBooks);
+    _loadSavedBooksCount();
+  }
+
+  Future<void> _loadSavedBooksCount() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+    final bookCount = await _bookService.booksCount();
+    final saveCount = await _bookService.saveBooksCountByUserId(userId);
+    final finishCount = await _bookService.finishBooksCountByUserId(userId);
+    setState(() {
+      _allBooksCount = bookCount;
+      _saveBooksCount = saveCount;
+      _finishBookCount = finishCount;
+    });
   }
 
   @override
@@ -30,28 +50,22 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
 
     final List<Map<String, dynamic>> libraryCategories = [
       {
-        'icon': Icons.bookmark_border,
-        'title': loc.saved,
-        'count': '15',
-        'onTap': '/'
+        'icon': Icons.book_outlined,
+        'title': loc.books,
+        'count': _allBooksCount,
+        'onTap': '/all-books'
       },
       {
-        'icon': Icons.collections_bookmark_outlined,
-        'title': loc.collections,
-        'count': '32',
-        'onTap': '/'
+        'icon': Icons.bookmark_border,
+        'title': loc.saved,
+        'count': _saveBooksCount,
+        'onTap': '/saved-books'
       },
       {
         'icon': Icons.check_circle_outline,
         'title': loc.finished,
-        'count': '1',
-        'onTap': '/'
-      },
-      {
-        'icon': Icons.download_outlined,
-        'title': loc.downloads,
-        'count': '32',
-        'onTap': '/download-history'
+        'count': _finishBookCount,
+        'onTap': '/finish-books'
       },
     ];
 
@@ -64,7 +78,7 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
               return libraryCategoryItem(
                 icon: category['icon'],
                 title: category['title'],
-                count: '${category['count']} ${loc.items}',
+                count: '${category['count']} ${category['count'] == 0 || category['count'] == 1 ? loc.item : loc.items}',
                 onTap: () {
                   final route = category['onTap'];
                   if (route is String && route.isNotEmpty) {
@@ -80,7 +94,7 @@ class _MyLibraryScreenState extends State<MyLibraryScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
             child: Text(
-              loc.myHistory,
+              loc.currently_reading,
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,

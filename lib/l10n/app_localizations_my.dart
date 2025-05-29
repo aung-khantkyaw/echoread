@@ -108,10 +108,16 @@ class AppLocalizationsMy extends AppLocalizations {
   String get home => 'မူလစာမျက်နှာ';
 
   @override
+  String get item => '';
+
+  @override
   String get items => 'ခု';
 
   @override
   String get language => 'ဘာသာစကား';
+
+  @override
+  String get latest_books => 'နောက်ဆုံးထည့်သွင်းထားသော စာအုပ်များ';
 
   @override
   String get logout => 'ထွက်ခွာမည်';

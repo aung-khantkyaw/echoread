@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> loadAllData() async {
     final detail = await getUserDetail();
-    final books = await _bookService.getBooks();
+    final books = await _bookService.getLatestThreeBooks();
 
     setState(() {
       userDetail = detail;

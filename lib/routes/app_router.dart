@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:echoread/features/admin/presentation/screens/book_manage_screen.dart';
-import 'package:echoread/features/admin/presentation/widgets/download_history_screen.dart';
+import 'package:echoread/features/library/presentation/widgets/saved_books_screen.dart';
 import 'package:echoread/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:echoread/features/auth/presentation/screens/login_screen.dart';
 import 'package:echoread/features/auth/presentation/screens/registration_screen.dart';
@@ -16,6 +16,9 @@ import 'package:echoread/features/library/presentation/screens/explore_screen.da
 
 import 'package:echoread/features/admin/presentation/screens/admin_screen.dart';
 import 'package:echoread/features/admin/presentation/screens/author_manage_screen.dart';
+
+import '../features/library/presentation/widgets/all_book_screen.dart';
+import '../features/library/presentation/widgets/finish_books_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -36,8 +39,13 @@ class AppRouter {
       case SettingPage.routeName:
         return MaterialPageRoute(builder: (_) => SettingPage());
 
-      case DownloadHistoryScreen.routeName:
-        return MaterialPageRoute(builder: (_) => DownloadHistoryScreen());
+      case SavedBooksScreen.routeName:
+        return MaterialPageRoute(builder: (_) => SavedBooksScreen());
+      case FinishBooksScreen.routeName:
+        return MaterialPageRoute(builder: (_) => FinishBooksScreen());
+      case AllBookScreen.routeName:
+        return MaterialPageRoute(builder: (_) => AllBookScreen());
+
       case AuthorProfilePage.routeName:
         final args = settings.arguments as Map<String, dynamic>?;
         final authorId = args?['authorId'];

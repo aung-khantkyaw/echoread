@@ -293,6 +293,12 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// No description provided for @item.
+  ///
+  /// In en, this message translates to:
+  /// **'item'**
+  String get item;
+
   /// No description provided for @items.
   ///
   /// In en, this message translates to:
@@ -304,6 +310,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Language'**
   String get language;
+
+  /// No description provided for @latest_books.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest Books'**
+  String get latest_books;
 
   /// No description provided for @logout.
   ///

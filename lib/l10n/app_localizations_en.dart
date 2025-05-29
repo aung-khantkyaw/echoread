@@ -108,10 +108,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
+  String get item => 'item';
+
+  @override
   String get items => 'items';
 
   @override
   String get language => 'Language';
+
+  @override
+  String get latest_books => 'Latest Books';
 
   @override
   String get logout => 'Log out';

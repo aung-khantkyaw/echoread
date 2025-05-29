@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/utils/func.dart';
@@ -20,7 +23,7 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
   final BookService _bookService = BookService();
 
   Map<String, dynamic>? userDetail;
-  List<Map<String, dynamic>>? _allBooks;
+  List<Map<String, dynamic>>? _currentReadingBooks;
 
   bool isLoading = true;
 
@@ -32,11 +35,11 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
 
   Future<void> loadAllData() async {
     final detail = await getUserDetail();
-    final books = await _bookService.getBooks();
+    final currentReadingBooks = await _bookService.getCurrentlyReadingBookByUserId(FirebaseAuth.instance.currentUser!.uid);
 
     setState(() {
       userDetail = detail;
-      _allBooks = books;
+      _currentReadingBooks = currentReadingBooks;
       isLoading = false;
     });
   }
@@ -54,7 +57,7 @@ class _MyLibraryPageState extends State<MyLibraryPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: MyLibraryScreen(allBooks: _allBooks ?? []),
+        child: MyLibraryScreen(currentReadingBooks: _currentReadingBooks ?? []),
       ),
       bottomNavigationBar: const BottomNavBar(currentIndex: 2), 
     );
