@@ -165,7 +165,6 @@ class BookService {
         return [];
       }
 
-      // Firestore queries for book details in parallel
       final futures = savedBooksSnapshot.docs.map((savedDoc) async {
         final data = savedDoc.data();
         final bookId = data['book_id'] as String;
@@ -176,7 +175,6 @@ class BookService {
         }
         final bookData = bookDoc.data()!;
 
-        // Optionally, include author data here if you want (like getBookDetail does)
         final authorId = bookData['author_id'] as String?;
         Map<String, dynamic>? authorData;
         if (authorId != null) {
@@ -195,11 +193,9 @@ class BookService {
         };
       }).toList();
 
-      // Wait for all parallel futures to complete
       final savedBooks = await Future.wait(futures);
 
       log(savedBooks.toString());
-      // Remove any nulls (if book missing)
       return savedBooks.whereType<Map<String, dynamic>>().toList();
     } catch (e, stackTrace) {
       log('Error getting saved books for user $userId: $e', stackTrace: stackTrace);

@@ -1,3 +1,8 @@
+import 'package:echoread/features/user/presentation/widgets/about_us_page.dart';
+import 'package:echoread/features/user/presentation/widgets/privacy_policy_page.dart';
+import 'package:echoread/features/user/presentation/widgets/teams_of_service.dart';
+import 'package:echoread/features/user/presentation/widgets/update_account_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/l10n/app_localizations.dart';
@@ -9,6 +14,8 @@ import 'package:echoread/features/auth/services/auth_service.dart';
 
 import 'package:echoread/main.dart';
 
+import 'help_center_page.dart';
+
 class SettingsScreen extends StatefulWidget {
   final Map<String, dynamic> userDetail;
 
@@ -19,31 +26,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  // Widget sectionTitle(String title) => Padding(
-  //   padding: const EdgeInsets.only(top: 30, left: 16, bottom: 8),
-  //   child: Text(
-  //     title,
-  //     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-  //   ),
-  // );
-  //
-  // Widget settingsItem(String label, {String? value, VoidCallback? onTap}) {
-  //   return ListTile(
-  //     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-  //     title: Text(
-  //       label,
-  //       style: const TextStyle(fontSize: 16),
-  //     ),
-  //     trailing: value != null
-  //         ? Text(
-  //       value,
-  //       style: const TextStyle(fontSize: 16),
-  //     )
-  //         : const Icon(Icons.arrow_forward_ios, size: 18),
-  //     // onTap: onTap ?? () => showSnackBar(context, '$label tapped'),
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     final userDetail = widget.userDetail;
@@ -67,21 +49,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             context,
             AppLocalizations.of(context)!.update_account,
             onTap: () {
-              Navigator.pushNamed(context, '/update-account');
-            },
-          ),
-          SystemWidgets.sectionItem(
-            context,
-            AppLocalizations.of(context)!.password_reset,
-            onTap: () {
-              Navigator.pushNamed(context, '/reset-password');
-            },
-          ),
-          SystemWidgets.sectionItem(
-            context,
-            AppLocalizations.of(context)!.email_address_change,
-            onTap: () {
-              Navigator.pushNamed(context, '/change-email');
+              print('Navigating with userId: ${FirebaseAuth.instance.currentUser!.uid} and username: ${userDetail['name']}');
+
+              Navigator.pushNamed(
+                context,
+                AccountUpdatePage.routeName,
+                arguments: {
+                  'accountId': FirebaseAuth.instance.currentUser!.uid,
+                  'username': userDetail['name'],
+                  'profileImg': profileImage,
+                },
+
+              );
+
             },
           ),
 
@@ -100,40 +80,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
           SystemWidgets.sectionTitle(AppLocalizations.of(context)!.about),
           SystemWidgets.sectionItem(
             context,
+            AppLocalizations.of(context)!.about_us,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutUsPage()),
+              );
+            },
+          ),
+          SystemWidgets.sectionItem(
+            context,
             AppLocalizations.of(context)!.privacy_policy,
             onTap: () {
-              Navigator.pushNamed(context, '/privacy-policy');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()),
+              );
+
             },
           ),
           SystemWidgets.sectionItem(
             context,
             AppLocalizations.of(context)!.terms_of_service,
             onTap: () {
-              Navigator.pushNamed(context, '/terms');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const TermsOfServicePage()),
+              );
             },
           ),
           SystemWidgets.sectionItem(
             context,
             AppLocalizations.of(context)!.help_center,
             onTap: () {
-              Navigator.pushNamed(context, '/help');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HelpCenterPage()),
+              );
             },
           ),
 
-          // SystemWidgets.sectionTitle('Manage Account'),
-          // SystemWidgets.sectionItem(context, 'Account', onTap: () {
-          //   Navigator.pushNamed(context, '/home');
-          // }),
-          // // sectionTitle('Manage subscription'),
-          // // settingsItem('Membership', value: 'Basic'),
-          // // sectionTitle('Content'),
-          // // settingsItem('Language', value: 'English'),
-          // // sectionTitle('Notifications'),
-          // // settingsItem('Push Notifications'),
-          // SystemWidgets.sectionTitle('About'),
-          // SystemWidgets.sectionItem(context, 'Privacy Policy'),
-          // SystemWidgets.sectionItem(context, 'Terms of Service'),
-          // SystemWidgets.sectionItem(context, 'Help Center'),
           const SizedBox(height: 30),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),

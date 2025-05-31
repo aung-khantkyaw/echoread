@@ -19,6 +19,8 @@ import 'package:echoread/features/admin/presentation/screens/author_manage_scree
 
 import '../features/library/presentation/widgets/all_book_screen.dart';
 import '../features/library/presentation/widgets/finish_books_screen.dart';
+import '../features/user/presentation/widgets/update_account_page.dart';
+import '../features/user/presentation/widgets/update_email_page.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -45,6 +47,35 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => FinishBooksScreen());
       case AllBookScreen.routeName:
         return MaterialPageRoute(builder: (_) => AllBookScreen());
+
+      case UpdateEmailScreen.routeName:
+        return MaterialPageRoute(builder: (_) => UpdateEmailScreen());
+      case AccountUpdatePage.routeName:
+        final args = settings.arguments as Map<String, dynamic>?;
+        final accountId = args?['accountId'];
+        final username = args?['username'];
+        final profileImg = args?['profileImg'];
+
+        if (accountId == null || username == null) {
+          return MaterialPageRoute(
+            builder: (_) => Scaffold(
+              body: Center(
+                child: Text('Account ID and Username are required'),
+              ),
+            ),
+          );
+        }
+
+        return MaterialPageRoute(
+          builder: (_) => AccountUpdatePage(
+            accountId: accountId,
+            username: username,
+            profileImg: profileImg,
+          ),
+          settings: settings,
+        );
+
+
 
       case AuthorProfilePage.routeName:
         final args = settings.arguments as Map<String, dynamic>?;

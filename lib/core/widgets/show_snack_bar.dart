@@ -10,7 +10,7 @@ void showSnackBar(BuildContext context, String message, {SnackBarType type = Sna
       content: Text(message),
       backgroundColor: color,
       behavior: SnackBarBehavior.floating,
-      duration: const Duration(seconds: 5),
+      duration: const Duration(seconds: 3),
     ),
   );
 }

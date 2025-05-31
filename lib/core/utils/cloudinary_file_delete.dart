@@ -7,13 +7,19 @@ class CloudinaryFileDelete {
   final String apiKey = dotenv.env['CLOUDINARY_API_KEY'] ?? '';
   final String apiSecret = dotenv.env['CLOUDINARY_API_SECRET'] ?? '';
 
-  /// resourceType = 'image', 'video', 'raw', or 'audio'
   Future<bool> deleteCloudinaryFile(String publicId, {String resourceType = 'raw'}) async {
-    final url = Uri.parse(
-      'https://api.cloudinary.com/v1_1/$cloudName/resources/$resourceType/upload/$publicId',
+    if (cloudName.isEmpty || apiKey.isEmpty || apiSecret.isEmpty) {
+      print('⚠️ Missing Cloudinary credentials.');
+      return false;
+    }
+
+    final url = Uri.https(
+      'api.cloudinary.com',
+      '/v1_1/$cloudName/resources/$resourceType/upload',
+      {'public_ids[]': publicId}, // <-- MUST be a query param
     );
 
-    final basicAuth = 'Basic ' + base64Encode(utf8.encode('$apiKey:$apiSecret'));
+    final basicAuth = 'Basic ${base64Encode(utf8.encode('$apiKey:$apiSecret'))}';
 
     try {
       final response = await http.delete(

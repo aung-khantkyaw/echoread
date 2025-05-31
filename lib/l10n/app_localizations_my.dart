@@ -12,6 +12,9 @@ class AppLocalizationsMy extends AppLocalizations {
   String get about => 'အကြောင်း';
 
   @override
+  String get about_us => 'ကျွန်ုပ်တို့ အကြောင်း';
+
+  @override
   String get add => 'ထည့်မည်';
 
   @override
@@ -190,4 +193,58 @@ class AppLocalizationsMy extends AppLocalizations {
 
   @override
   String get updating => 'ပြင်ဆင်နေသည်...';
+
+  @override
+  String get username => 'အသုံးပြုသူ';
+
+  @override
+  String get username_required => 'အသုံးပြုသူအမည်လိုအပ်သည်';
+
+  @override
+  String get save_changes => 'ပြောင်းလဲမှုများသိမ်းမည်';
+
+  @override
+  String get enter_book_description => 'စာအုပ်အကြောင်းအရာထည့်ပါ';
+
+  @override
+  String get select_an_author => 'စာရေးသူကိုရွေးပါ';
+
+  @override
+  String get enter_book_name => 'စာအုပ်အမည်ထည့်ပါ';
+
+  @override
+  String get update_book => 'စာအုပ်ပြင်မည်';
+
+  @override
+  String get failed_to_update_book => 'စာအုပ်ပြင်ဆင်ခြင်းမအောင်မြင်ပါ';
+
+  @override
+  String get book_updated_successfully => 'စာအုပ်အောင်မြင်စွာပြင်ဆင်ပြီးပါပြီ';
+
+  @override
+  String get select_book_cover_hint => 'စာအုပ်ကာဗာရွေးပါ';
+
+  @override
+  String get select_ebook_file_hint => 'eBook ဖိုင်ရွေးပါ';
+
+  @override
+  String get select_audio_file_hint => 'အသံဖိုင်ရွေးပါ';
+
+  @override
+  String get select_author_hint => 'စာရေးသူကိုရွေးချယ်ရန်';
+
+  @override
+  String get validation_error => 'ထည့်သွင်းမှုမမှန်ကန်ပါ';
+
+  @override
+  String get audio_access_denied => 'အသံဖိုင်ရယူခွင့်မပြုပါ';
+
+  @override
+  String get ebook_file_pick_error => 'eBook ဖိုင်ရွေးချယ်ရာတွင်အမှားရှိသည်';
+
+  @override
+  String get no_ebook_file_selected => 'eBook ဖိုင်ရွေးမထားပါ';
+
+  @override
+  String get image_access_denied => 'ပုံရယူခွင့်မပြုပါ';
 }

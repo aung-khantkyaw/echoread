@@ -6,6 +6,7 @@ import 'package:echoread/core/widgets/book_card.dart';
 
 import '../../services/book_manage_service.dart';
 import 'book_add_page.dart';
+import 'book_update_page.dart';
 
 class BookManage extends StatefulWidget {
   final List<Map<String, dynamic>> booksList;
@@ -46,8 +47,7 @@ class _BookManageState extends State<BookManage> {
           .where((book) {
         final name = (book['book_name'] ?? '').toString().toLowerCase();
         return name.contains(query.toLowerCase());
-      })
-          .toList();
+      }).toList();
     });
   }
 
@@ -64,19 +64,18 @@ class _BookManageState extends State<BookManage> {
   }
 
   void _goToEditBook(Map<String, dynamic> book) async {
-    showSnackBar(context, 'still building ...');
-    // final updated = await Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (_) => BookUpdatePage(
-    //       bookData: book,
-    //       authorsList: widget.authorsList,
-    //     ),
-    //   ),
-    // );
+    final updated = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BookUpdatePage(
+          bookData: book,
+          authorsList: widget.authorsList
+        ),
+      ),
+    );
 
-    // if (updated == true) {
-    //   await _refreshBooks();
-    // }
+    if (updated == true) {
+      await _refreshBooks();
+    }
   }
 
   @override

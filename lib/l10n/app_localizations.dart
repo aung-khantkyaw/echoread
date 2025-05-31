@@ -101,6 +101,12 @@ abstract class AppLocalizations {
   /// **'About'**
   String get about;
 
+  /// No description provided for @about_us.
+  ///
+  /// In en, this message translates to:
+  /// **'About Us'**
+  String get about_us;
+
   /// No description provided for @add.
   ///
   /// In en, this message translates to:
@@ -460,6 +466,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Updating . . . '**
   String get updating;
+
+  /// No description provided for @username.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// No description provided for @username_required.
+  ///
+  /// In en, this message translates to:
+  /// **'Username Required'**
+  String get username_required;
+
+  /// No description provided for @save_changes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get save_changes;
+
+  /// No description provided for @enter_book_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Book Description'**
+  String get enter_book_description;
+
+  /// No description provided for @select_an_author.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an Author'**
+  String get select_an_author;
+
+  /// No description provided for @enter_book_name.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Book Name'**
+  String get enter_book_name;
+
+  /// No description provided for @update_book.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Book'**
+  String get update_book;
+
+  /// No description provided for @failed_to_update_book.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to Update Book'**
+  String get failed_to_update_book;
+
+  /// No description provided for @book_updated_successfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Book Updated Successfully'**
+  String get book_updated_successfully;
+
+  /// No description provided for @select_book_cover_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Book Cover'**
+  String get select_book_cover_hint;
+
+  /// No description provided for @select_ebook_file_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Ebook File'**
+  String get select_ebook_file_hint;
+
+  /// No description provided for @select_audio_file_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Audio File'**
+  String get select_audio_file_hint;
+
+  /// No description provided for @select_author_hint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an Author'**
+  String get select_author_hint;
+
+  /// No description provided for @validation_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Validation Error'**
+  String get validation_error;
+
+  /// No description provided for @audio_access_denied.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio Access Denied'**
+  String get audio_access_denied;
+
+  /// No description provided for @ebook_file_pick_error.
+  ///
+  /// In en, this message translates to:
+  /// **'Ebook File Pick Error'**
+  String get ebook_file_pick_error;
+
+  /// No description provided for @no_ebook_file_selected.
+  ///
+  /// In en, this message translates to:
+  /// **'No Ebook File Selected'**
+  String get no_ebook_file_selected;
+
+  /// No description provided for @image_access_denied.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Access Denied'**
+  String get image_access_denied;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

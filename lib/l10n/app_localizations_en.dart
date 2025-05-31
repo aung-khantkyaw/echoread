@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get about => 'About';
 
   @override
+  String get about_us => 'About Us';
+
+  @override
   String get add => 'Add';
 
   @override
@@ -190,4 +193,58 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updating => 'Updating . . . ';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get username_required => 'Username Required';
+
+  @override
+  String get save_changes => 'Save Changes';
+
+  @override
+  String get enter_book_description => 'Enter Book Description';
+
+  @override
+  String get select_an_author => 'Select an Author';
+
+  @override
+  String get enter_book_name => 'Enter Book Name';
+
+  @override
+  String get update_book => 'Update Book';
+
+  @override
+  String get failed_to_update_book => 'Failed to Update Book';
+
+  @override
+  String get book_updated_successfully => 'Book Updated Successfully';
+
+  @override
+  String get select_book_cover_hint => 'Select Book Cover';
+
+  @override
+  String get select_ebook_file_hint => 'Select Ebook File';
+
+  @override
+  String get select_audio_file_hint => 'Select Audio File';
+
+  @override
+  String get select_author_hint => 'Select an Author';
+
+  @override
+  String get validation_error => 'Validation Error';
+
+  @override
+  String get audio_access_denied => 'Audio Access Denied';
+
+  @override
+  String get ebook_file_pick_error => 'Ebook File Pick Error';
+
+  @override
+  String get no_ebook_file_selected => 'No Ebook File Selected';
+
+  @override
+  String get image_access_denied => 'Image Access Denied';
 }

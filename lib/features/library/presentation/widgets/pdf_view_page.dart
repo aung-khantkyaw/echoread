@@ -21,25 +21,22 @@ class PdfMergedViewScreen extends StatefulWidget {
     super.key,
     required this.parts,
     required this.title,
-    required this.bookId
+    required this.bookId,
   });
 
   @override
   State<PdfMergedViewScreen> createState() => _PdfMergedViewScreenState();
 }
 
-class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
-    with WidgetsBindingObserver {
+class _PdfMergedViewScreenState extends State<PdfMergedViewScreen> {
   Uint8List? mergedPdfBytes;
   bool isLoading = true;
   String? error;
   String? readingStatusDocId;
   final PdfViewerController _pdfViewerController = PdfViewerController();
   int? _totalPages;
-  int _readingDurationInMinutes = 0; // This will hold the total pages as minutes
-  int _remainingMinutes = 0; // This will decrement
+  int _remainingMinutes = 0;
   Timer? _timer;
-  DateTime? _startTime;
   bool isMarkedComplete = false;
   bool _isOnLastPage = false;
 
@@ -49,20 +46,7 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     initialize();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused) {
-      _timer?.cancel(); // Pause the timer
-      log('Timer paused');
-    } else if (state == AppLifecycleState.resumed && _remainingMinutes > 0) {
-      startTimer(); // Resume the timer if there's time left
-      log('Timer resumed');
-    }
   }
 
   Future<void> initialize() async {
@@ -74,10 +58,7 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
       return;
     }
 
-    await mergeChunks(); // Merge chunks first to get the PDF bytes
-
-    // The _totalPages will be set in onDocumentLoaded callback
-    // We'll then call createReadingStatus and other init logic there.
+    await mergeChunks();
 
     setState(() {
       isLoading = false;
@@ -107,9 +88,9 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
         readingStatusDocId = query.docs.first.id;
         final data = query.docs.first.data();
         _remainingMinutes = data['remainingMinutes'] ?? 0;
+        isMarkedComplete = data['isComplete'] ?? false; // Make sure to load isMarkedComplete
         log("Existing reading_status found. Remaining minutes: $_remainingMinutes");
       } else {
-        // Only set _remainingMinutes to totalPages if it's a new entry
         _remainingMinutes = totalPages;
         final docRef = await _firestore.collection('reading_status').add({
           'userId': user.uid,
@@ -117,7 +98,7 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
           'startDate': Timestamp.now(),
           'isComplete': false,
           'lastReadPage': 1,
-          'remainingMinutes': _remainingMinutes, // Use the totalPages here
+          'remainingMinutes': _remainingMinutes,
         });
         readingStatusDocId = docRef.id;
         log("New reading_status created. Initial remaining minutes: $_remainingMinutes");
@@ -133,8 +114,10 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
     if (readingStatusDocId == null) return null;
 
     try {
-      final doc =
-      await _firestore.collection('reading_status').doc(readingStatusDocId).get();
+      final doc = await _firestore
+          .collection('reading_status')
+          .doc(readingStatusDocId)
+          .get();
       final data = doc.data();
       if (data != null && data.containsKey('lastReadPage')) {
         return data['lastReadPage'];
@@ -146,7 +129,8 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
   }
 
   Future<void> mergeChunks() async {
-    const apiUrl = "https://echo-read-media-split-merge.onrender.com/api/pdf/merge";
+    const apiUrl =
+        "https://echo-read-media-split-merge.onrender.com/api/pdf/merge";
 
     if (widget.parts.isEmpty) {
       setState(() {
@@ -183,41 +167,29 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
   }
 
   void startTimer() {
-    _startTime = DateTime.now();
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(minutes: 1), (_) {
       if (_remainingMinutes > 0) {
         _remainingMinutes--;
         updateRemainingTime(_remainingMinutes);
-        setState(() {}); // update UI for remainingMinutes changes
+        setState(() {});
 
-        if (_remainingMinutes <= 0 && _isOnLastPage && !isMarkedComplete) {
-          // You might want to automatically prompt or show "Mark as Complete" button here
-        }
       } else {
         _timer?.cancel();
+        log('Timer finished, remaining minutes is 0.');
       }
     });
-  }
-
-  void startBottomCheckTimer() {
-    _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
-      if (_pdfViewerController.pageNumber == _totalPages) {
-        setState(() {
-          _isOnLastPage = true;
-        });
-      } else {
-        setState(() {
-          _isOnLastPage = false;
-        });
-      }
-    });
+    log('Timer started for PdfMergedViewScreen');
+    showSnackBar(context, 'Timer started for PdfMergedViewScreen');
   }
 
   Future<void> updateRemainingTime(int minutes) async {
     if (readingStatusDocId == null) return;
     try {
-      await _firestore.collection('reading_status').doc(readingStatusDocId).update({
+      await _firestore
+          .collection('reading_status')
+          .doc(readingStatusDocId)
+          .update({
         'remainingMinutes': minutes,
       });
     } catch (e) {
@@ -228,10 +200,22 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
   Future<void> updateLastReadPage(int pageNumber) async {
     if (readingStatusDocId == null) return;
     try {
-      await _firestore.collection('reading_status').doc(readingStatusDocId).update({
+      await _firestore
+          .collection('reading_status')
+          .doc(readingStatusDocId)
+          .update({
         'lastReadPage': pageNumber,
       });
       log("Updated last read page to $pageNumber");
+      if (_totalPages != null && pageNumber == _totalPages) {
+        setState(() {
+          _isOnLastPage = true;
+        });
+      } else {
+        setState(() {
+          _isOnLastPage = false;
+        });
+      }
     } catch (e) {
       log('Failed to update last read page: $e');
     }
@@ -240,12 +224,17 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
   Future<void> markAsComplete() async {
     if (readingStatusDocId == null || isMarkedComplete) return;
     try {
-      await _firestore.collection('reading_status').doc(readingStatusDocId).update({
+      await _firestore
+          .collection('reading_status')
+          .doc(readingStatusDocId)
+          .update({
         'isComplete': true,
         'endDate': Timestamp.now(),
         'remainingMinutes': 0,
       });
-      isMarkedComplete = true;
+      setState(() {
+        isMarkedComplete = true;
+      });
       showSnackBar(context, "Marked as complete!", type: SnackBarType.success);
     } catch (e) {
       log('Failed to update reading status: $e');
@@ -300,7 +289,6 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
               controller: _pdfViewerController,
               onDocumentLoaded: (details) async {
                 _totalPages = details.document.pages.count;
-                _readingDurationInMinutes = _totalPages!;
                 log("Total pages: $_totalPages");
 
                 await createReadingStatus(totalPages: _totalPages!);
@@ -308,13 +296,20 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
                 int? lastReadPage = await getLastReadPage();
                 if (lastReadPage != null && lastReadPage > 0) {
                   _pdfViewerController.jumpToPage(lastReadPage);
+                  if (lastReadPage == _totalPages) {
+                    setState(() {
+                      _isOnLastPage = true;
+                    });
+                  }
                 }
 
-                if (_remainingMinutes > 0) {
+                if (_remainingMinutes > 0 && !isMarkedComplete) {
                   startTimer();
+                } else if (_remainingMinutes <= 0 && _totalPages != null && _pdfViewerController.pageNumber == _totalPages && !isMarkedComplete) {
+                  setState(() {
+                    _isOnLastPage = true;
+                  });
                 }
-
-                startBottomCheckTimer();
               },
               onPageChanged: (details) {
                 updateLastReadPage(details.newPageNumber);
@@ -324,15 +319,22 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
           // Button appear at bottom
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
-            bottom: _isOnLastPage && showCompleteButton ? 20 : -60,
+            bottom: showCompleteButton ? 20 : -100,
             left: 20,
             right: 20,
             child: AnimatedOpacity(
-              opacity: _isOnLastPage && showCompleteButton ? 1.0 : 0.0,
+              opacity: showCompleteButton ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 300),
-              child: ElevatedButton(
-                onPressed: markAsComplete,
-                child: const Text("Mark as Complete"),
+              child: IgnorePointer(
+                ignoring: !showCompleteButton,
+                child: ElevatedButton(
+                  onPressed: markAsComplete,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  child: const Text("Mark as Complete"),
+                ),
               ),
             ),
           ),
@@ -343,8 +345,8 @@ class _PdfMergedViewScreenState extends State<PdfMergedViewScreen>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
+    log('Timer paused/cancelled when leaving PdfMergedViewScreen');
     super.dispose();
   }
 }
