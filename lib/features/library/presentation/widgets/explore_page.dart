@@ -1,9 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:echoread/l10n/app_localizations.dart';
 
-import '../../../../core/config/cloudinary_config.dart';
+import 'package:echoread/core/config/cloudinary_config.dart';
 
 class ExplorerScreen extends StatefulWidget {
   final List<Map<String, dynamic>> authorsList;

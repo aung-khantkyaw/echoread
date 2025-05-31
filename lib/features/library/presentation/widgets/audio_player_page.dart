@@ -33,21 +33,18 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
     _player = AudioPlayer();
     _setupAudio();
 
-    // Current position update
     _player.positionStream.listen((position) {
       setState(() {
         _current = position;
       });
     });
 
-    // Player play/pause state update
     _player.playerStateStream.listen((state) {
       setState(() {
         _isPlaying = state.playing;
       });
     });
 
-    // Current index update
     _player.currentIndexStream.listen((index) {
       if (index != null) {
         setState(() {
@@ -56,7 +53,6 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       }
     });
 
-    // Listen to sequenceStateStream to update total duration of current track
     _player.sequenceStateStream.listen((sequenceState) {
       final currentSource = sequenceState?.currentSource;
       final dur = currentSource?.duration ?? Duration.zero;
@@ -73,9 +69,6 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
       );
 
       await _player.setAudioSource(playlist);
-
-      // Optionally autoplay
-      // _player.play();
     } catch (e) {
       log('Audio load error: $e');
     }
@@ -148,7 +141,6 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
 
               const SizedBox(height: 4),
 
-              // Playback Controls
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -202,7 +194,6 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
               ),
               const SizedBox(height: 4),
 
-              // Up Next List
               Expanded(
                 child: ListView.builder(
                   itemCount: widget.audioUrls.length,

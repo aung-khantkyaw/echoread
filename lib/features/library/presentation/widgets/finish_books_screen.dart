@@ -1,11 +1,8 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:echoread/core/widgets/app_bar.dart';
-import 'package:echoread/core/widgets/show_snack_bar.dart';
 
 import '../../services/book_service.dart';
 

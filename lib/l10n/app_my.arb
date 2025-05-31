@@ -1,6 +1,7 @@
 {
   "@@locale": "my",
   "about": "အကြောင်း",
+  "about_us": "ကျွန်ုပ်တို့ အကြောင်း",
   "add": "ထည့်မည်",
   "add_another_audio_file": "အသံဖိုင်ပေါင်းထည့်မည်",
   "add_author": "စာရေးသူအသစ်ထည့်မည်",
@@ -60,5 +61,23 @@
   "update": "ပြင်မည်",
   "update_account": "အကောင့် ပြင်ဆင်ရန်",
   "update_author": "စာရေးသူအားပြင်မည်",
-  "updating": "ပြင်ဆင်နေသည်..."
+  "updating": "ပြင်ဆင်နေသည်...",
+  "username": "အသုံးပြုသူ",
+  "username_required": "အသုံးပြုသူအမည်လိုအပ်သည်",
+  "save_changes": "ပြောင်းလဲမှုများသိမ်းမည်",
+  "enter_book_description": "စာအုပ်အကြောင်းအရာထည့်ပါ",
+  "select_an_author": "စာရေးသူကိုရွေးပါ",
+  "enter_book_name": "စာအုပ်အမည်ထည့်ပါ",
+  "update_book": "စာအုပ်ပြင်မည်",
+  "failed_to_update_book": "စာအုပ်ပြင်ဆင်ခြင်းမအောင်မြင်ပါ",
+  "book_updated_successfully": "စာအုပ်အောင်မြင်စွာပြင်ဆင်ပြီးပါပြီ",
+  "select_book_cover_hint": "စာအုပ်ကာဗာရွေးပါ",
+  "select_ebook_file_hint": "eBook ဖိုင်ရွေးပါ",
+  "select_audio_file_hint": "အသံဖိုင်ရွေးပါ",
+  "select_author_hint": "စာရေးသူကိုရွေးချယ်ရန်",
+  "validation_error": "ထည့်သွင်းမှုမမှန်ကန်ပါ",
+  "audio_access_denied": "အသံဖိုင်ရယူခွင့်မပြုပါ",
+  "ebook_file_pick_error": "eBook ဖိုင်ရွေးချယ်ရာတွင်အမှားရှိသည်",
+  "no_ebook_file_selected": "eBook ဖိုင်ရွေးမထားပါ",
+  "image_access_denied": "ပုံရယူခွင့်မပြုပါ"
 }

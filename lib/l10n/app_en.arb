@@ -1,6 +1,7 @@
 {
   "@@locale": "en",
   "about": "About",
+  "about_us": "About Us",
   "add": "Add",
   "add_another_audio_file": "Add another audio file",
   "add_author": "Add Author",
@@ -60,5 +61,23 @@
   "update": "Update",
   "update_account": "Update Account",
   "update_author": "Update Author",
-  "updating": "Updating . . . "
+  "updating": "Updating . . . ",
+  "username": "Username",
+  "username_required": "Username Required",
+  "save_changes": "Save Changes",
+  "enter_book_description": "Enter Book Description",
+  "select_an_author": "Select an Author",
+  "enter_book_name": "Enter Book Name",
+  "update_book": "Update Book",
+  "failed_to_update_book": "Failed to Update Book",
+  "book_updated_successfully": "Book Updated Successfully",
+  "select_book_cover_hint": "Select Book Cover",
+  "select_ebook_file_hint": "Select Ebook File",
+  "select_audio_file_hint": "Select Audio File",
+  "select_author_hint": "Select an Author",
+  "validation_error": "Validation Error",
+  "audio_access_denied": "Audio Access Denied",
+  "ebook_file_pick_error": "Ebook File Pick Error",
+  "no_ebook_file_selected": "No Ebook File Selected",
+  "image_access_denied": "Image Access Denied"
 }

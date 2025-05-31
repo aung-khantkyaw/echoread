@@ -5,6 +5,7 @@ import 'package:echoread/core/utils/validators.dart';
 import 'package:echoread/core/widgets/input_decoration.dart';
 
 import '../../services/auth_service.dart';
+import '../screens/login_screen.dart';
 
 class ForgetPasswordForm extends StatefulWidget {
   const ForgetPasswordForm({super.key});
@@ -39,7 +40,18 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
         _isLoading = false;
       });
 
-      showSnackBar(context, result ?? 'Something went wrong.', type: SnackBarType.error);
+      if (result == null) {
+        // success (assuming result == null means success)
+        showSnackBar(context, 'Reset link sent successfully!', type: SnackBarType.success);
+
+        // Navigate to login screen after success
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const LoginPage()),
+        );
+      } else {
+        // error message from backend
+        showSnackBar(context, result, type: SnackBarType.error);
+      }
     } catch (e) {
       setState(() {
         _isLoading = false;

@@ -36,7 +36,7 @@ class _SavedBooksScreenState extends State<SavedBooksScreen> {
       _currentUserId = user.uid;
     } else {
       log('User not logged in');
-      _currentUserId = 'T7WSeYtDek1G6GqQa1KK'; // fallback if needed
+      _currentUserId = 'T7WSeYtDek1G6GqQa1KK';
     }
     await _fetchSavedBooks();
   }
@@ -55,13 +55,9 @@ class _SavedBooksScreenState extends State<SavedBooksScreen> {
 
   Future<void> _unsaveBook(String savedBookId, String bookId) async {
     try {
-      // Remove saved book via BookService logic
-      // Your existing removeSavedBookForUser method is a bit different (uses subcollection)
-      // Here, savedBookId is the document ID in saved_books collection, so delete directly:
       await FirebaseFirestore.instance.collection('saved_books').doc(savedBookId).delete();
 
       showSnackBar(context, 'Book unsaved successfully!', type: SnackBarType.success);
-      // Refresh list
       await _fetchSavedBooks();
     } catch (e) {
       log('Error unsaving book: $e');
@@ -119,8 +115,8 @@ class _SavedBooksScreenState extends State<SavedBooksScreen> {
               )
                   : const Icon(Icons.book, size: 50),
               title: Text(bookName),
-              subtitle: Text('Author: $authorName\n'
-                  'Saved on: ${savedAtTimestamp != null ? savedAtTimestamp.toDate().toLocal().toString().split(' ')[0] : 'Unknown'}'),
+              subtitle: Text(
+                  'Author: $authorName\nSaved on: ${savedAtTimestamp != null ? savedAtTimestamp.toDate().toLocal().toString().split(' ')[0] : 'Unknown'}'),
               isThreeLine: true,
               trailing: IconButton(
                 icon: const Icon(Icons.bookmark_remove, color: Colors.red),
@@ -150,6 +146,15 @@ class _SavedBooksScreenState extends State<SavedBooksScreen> {
                   }
                 },
               ),
+
+              // Add onTap here to navigate to detail page
+              onTap: () {
+                Navigator.pushNamed(
+                  context,
+                  '/book-detail',
+                  arguments: {'bookId': bookId},
+                );
+              },
             ),
           );
         },
