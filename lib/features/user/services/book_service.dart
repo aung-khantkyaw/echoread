@@ -41,7 +41,6 @@ class BookService{
 
   Future<List<Map<String, dynamic>>> getLatestThreeBooks() async {
     try {
-      // Fetch latest 3 books ordered by 'createdAt' in descending order
       final booksSnapshot = await _firestore
           .collection('books')
           .orderBy('created_at', descending: true)
@@ -55,21 +54,26 @@ class BookService{
 
       final authorIds = books
           .map((book) => book['author_id'])
+          .whereType<String>()
           .toSet()
           .toList();
 
-      final authorsSnapshot = await _firestore
-          .collection('authors')
-          .where(FieldPath.documentId, whereIn: authorIds)
-          .get();
+      Map<String, dynamic> authorsMap = {};
 
-      final authorsMap = {
-        for (var doc in authorsSnapshot.docs) doc.id: doc.data()
-      };
+      if (authorIds.isNotEmpty) {
+        final authorsSnapshot = await _firestore
+            .collection('authors')
+            .where(FieldPath.documentId, whereIn: authorIds)
+            .get();
+
+        authorsMap = {
+          for (var doc in authorsSnapshot.docs) doc.id: doc.data()
+        };
+      }
 
       return books.map((book) => {
         ...book,
-        'author': authorsMap[book['author_id']],
+        'author': authorsMap[book['author_id']] ?? {},
       }).toList();
     } catch (e, stackTrace) {
       log('Unexpected error in getLatestThreeBooks: $e', stackTrace: stackTrace);
@@ -144,7 +148,7 @@ class BookService{
 
       return querySnapshot.docs.length;
     } catch (e) {
-      print('Error counting saved books: $e');
+      log('Error counting saved books: $e');
       return 0;
     }
   }
@@ -158,7 +162,7 @@ class BookService{
 
       return querySnapshot.docs.length;
     } catch (e) {
-      print('Error counting saved books: $e');
+      log('Error counting saved books: $e');
       return 0;
     }
   }
@@ -173,7 +177,7 @@ class BookService{
 
       return querySnapshot.docs.length;
     } catch (e) {
-      print('Error counting saved books: $e');
+      log('Error counting saved books: $e');
       return 0; 
     }
   }

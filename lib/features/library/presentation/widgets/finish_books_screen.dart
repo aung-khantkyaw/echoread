@@ -69,11 +69,11 @@ class _FinishBooksScreenState extends State<FinishBooksScreen> {
         itemCount: _finishBooks.length,
         itemBuilder: (context, index) {
           final finishBook = _finishBooks[index];
-          final finishBookId = finishBook['finish_book_id'] as String? ?? '';
+          // final finishBookId = finishBook['finish_book_id'] as String? ?? '';
           final finishAtTimestamp = finishBook['finish_at'] as Timestamp?;
           final book = finishBook['book'] as Map<String, dynamic>?;
 
-          final bookId = book?['id'] ?? '';
+          // final bookId = book?['id'] ?? '';
           final bookName = book?['book_name'] ?? 'Unknown Book';
           final bookImg = book?['book_img'] ?? '';
           final author = book?['author'] as Map<String, dynamic>?;

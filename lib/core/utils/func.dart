@@ -46,8 +46,8 @@ Future<List<String>> splitAudioByDurationWrapper(Map<String, dynamic> args) {
 
 Future<List<String>> splitPdfByPage(File pdfFile, int pagesPerChunk) async {
   log('File Path : $pdfFile');
-  // final uri = Uri.parse('https://echo-read-media-split-merge.onrender.com/api/pdf/split');
-  final uri = Uri.parse('http://192.168.100.28:3000/api/pdf/split');
+  final uri = Uri.parse('https://echo-read-media-split-merge.onrender.com/api/pdf/split');
+  // final uri = Uri.parse('http://192.168.100.28:3000/api/pdf/split');
   final request = http.MultipartRequest('POST', uri)
     ..fields['pages_per_chunk'] = pagesPerChunk.toString()
     ..files.add(
@@ -79,8 +79,8 @@ Future<List<String>> splitPdfByPage(File pdfFile, int pagesPerChunk) async {
 // Audio Split Logic
 Future<List<String>> splitAudioByDuration(File audioFile, int durationMinutes) async {
   try {
-    // final uri = Uri.parse('https://echo-read-media-split-merge.onrender.com/api/audio/split');
-    final uri = Uri.parse('http://192.168.100.28:3000/api/audio/split');
+    final uri = Uri.parse('https://echo-read-media-split-merge.onrender.com/api/audio/split');
+    // final uri = Uri.parse('http://192.168.100.28:3000/api/audio/split');
     final request = http.MultipartRequest('POST', uri)
       ..fields['duration'] = durationMinutes.toString()
       ..files.add(await http.MultipartFile.fromPath(

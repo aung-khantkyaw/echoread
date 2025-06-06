@@ -23,27 +23,33 @@ class BookManageService {
 
       final authorIds = books
           .map((book) => book['author_id'])
+          .whereType<String>()
           .toSet()
           .toList();
 
-      final authorsSnapshot = await _firestore
-          .collection('authors')
-          .where(FieldPath.documentId, whereIn: authorIds)
-          .get();
+      Map<String, dynamic> authorsMap = {};
 
-      final authorsMap = {
-        for (var doc in authorsSnapshot.docs) doc.id: doc.data()
-      };
+      if (authorIds.isNotEmpty) {
+        final authorsSnapshot = await _firestore
+            .collection('authors')
+            .where(FieldPath.documentId, whereIn: authorIds)
+            .get();
+
+        authorsMap = {
+          for (var doc in authorsSnapshot.docs) doc.id: doc.data()
+        };
+      }
 
       return books.map((book) => {
         ...book,
-        'author': authorsMap[book['author_id']],
+        'author': authorsMap[book['author_id']] ?? {},
       }).toList();
     } catch (e, stackTrace) {
       log('Unexpected error in getBooks: $e', stackTrace: stackTrace);
       return [];
     }
   }
+
 
   Future<void> createBook({
     required File bookImage,

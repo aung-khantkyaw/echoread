@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:echoread/features/user/presentation/widgets/about_us_page.dart';
 import 'package:echoread/features/user/presentation/widgets/privacy_policy_page.dart';
 import 'package:echoread/features/user/presentation/widgets/teams_of_service.dart';
 import 'package:echoread/features/user/presentation/widgets/update_account_page.dart';
+// import 'package:echoread/features/user/presentation/widgets/update_email_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             context,
             AppLocalizations.of(context)!.update_account,
             onTap: () {
-              print('Navigating with userId: ${FirebaseAuth.instance.currentUser!.uid} and username: ${userDetail['name']}');
+              log('Navigating with userId: ${FirebaseAuth.instance.currentUser!.uid} and username: ${userDetail['name']}');
 
               Navigator.pushNamed(
                 context,
@@ -59,11 +62,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   'username': userDetail['name'],
                   'profileImg': profileImage,
                 },
-
               );
-
             },
           ),
+          // SystemWidgets.sectionItem(
+          //     context,
+          //     AppLocalizations.of(context)!.email_address_change,
+          //     onTap: (){
+          //       Navigator.pushNamed(
+          //           context,
+          //           UpdateEmailScreen.routeName
+          //       );
+          //     }
+          // ),
 
           SystemWidgets.sectionTitle(AppLocalizations.of(context)!.language),
           SystemWidgets.sectionItem(

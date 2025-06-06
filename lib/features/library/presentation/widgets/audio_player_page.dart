@@ -54,7 +54,7 @@ class _AudioPlayScreenState extends State<AudioPlayScreen> {
     });
 
     _player.sequenceStateStream.listen((sequenceState) {
-      final currentSource = sequenceState?.currentSource;
+      final currentSource = sequenceState.currentSource;
       final dur = currentSource?.duration ?? Duration.zero;
       setState(() {
         _total = dur;
