@@ -150,9 +150,11 @@ class _BookAddFormState extends State<BookAddForm> {
           authorId: _selectedAuthorId!,
         );
 
+        final updatedBookList = await _bookService.getBooks();
+
         if (!mounted) return;
         showSnackBar(context, 'Book created successfully', type: SnackBarType.success);
-        Navigator.pop(context);
+        Navigator.pop(context, updatedBookList);
       } catch (e) {
         if (!mounted) return;
         showSnackBar(context, 'Failed to create book: $e', type: SnackBarType.error);

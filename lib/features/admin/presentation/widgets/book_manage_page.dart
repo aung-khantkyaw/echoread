@@ -37,6 +37,7 @@ class _BookManageState extends State<BookManage> {
   Future<void> _refreshBooks() async {
     final freshBooks = await _bookService.getBooks();
     setState(() {
+      _allBooks = freshBooks;
       _books = freshBooks;
     });
   }

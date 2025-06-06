@@ -29,6 +29,7 @@ class _AllBookScreenState extends State<AllBookScreen> {
   void initState() {
     super.initState();
     _loadBooks();
+    _refreshBooks();
   }
 
   Future<void> _loadBooks() async {

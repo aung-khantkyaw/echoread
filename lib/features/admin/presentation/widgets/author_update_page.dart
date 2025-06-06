@@ -138,7 +138,7 @@ class _AuthorUpdatePageState extends State<AuthorUpdatePage> {
                     ),
                     child: _isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(locale.add_author),
+                        : Text(locale.update_author),
                   ),
                 ],
               ),

@@ -50,7 +50,7 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
         );
       } else {
         // error message from backend
-        showSnackBar(context, result, type: SnackBarType.error);
+        showSnackBar(context, result, type: SnackBarType.success);
       }
     } catch (e) {
       setState(() {
